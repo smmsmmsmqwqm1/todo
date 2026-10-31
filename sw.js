@@ -1,6 +1,6 @@
 /* 서비스 워커 — 앱 파일을 기기에 담아 두어 인터넷 없이도 열린다. build.py가 아래 두 줄을 채운다.
    판이 바뀌면 CACHE 이름이 바뀌어, 다음에 열 때 말없이 새 판으로 바뀐다(할 일 데이터는 localStorage라 그대로). */
-var CACHE = 'todo02-75a7a60f';
+var CACHE = 'todo02-91e91dc9';
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener('install', function (e) {
