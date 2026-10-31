@@ -891,7 +891,7 @@ textarea.field { resize: none; line-height: 1.45; }
 .screen-cal.is-morph:not(.is-rising) .cal-cell { transition: height 340ms var(--ease), background var(--fast); }
 /* 작게 돌아갈 때: 칸은 한 번에 바꾸고 아래 목록만 위치 · 투명도로 올라옴 — 42칸 높이를 매 순간 다시 계산해 폰에서 버벅이던 것 (사용자 10-31 '내리면서 펼쳐질 때 렉') */
 .screen-cal.is-rising .day-panel { animation: panel-rise 320ms var(--ease); }
-.screen-cal.is-rising .cal-track { animation: grid-settle 260ms var(--ease); }
+.screen-cal.is-rising .cal-track, .screen-cal.is-expanding .cal-track { animation: grid-settle 220ms var(--ease); }
 @keyframes panel-rise { from { opacity: 0; transform: translateY(48px); } }
 @keyframes grid-settle { from { opacity: .55; } }
 .screen-cal.is-morph :is(.cal-peeks, .cal-lanes) { animation: peeks-in 340ms var(--ease); }
@@ -1122,7 +1122,7 @@ html[data-text="lg"] .qa-chips, html[data-text="xl"] .qa-chips { flex-wrap: wrap
 <div id="toast" class="toast-host" aria-live="polite"></div>
 
 <!-- 불러오는 순서 = 층 순서. 아래층(core · domain)은 위층(screens)을 모른다. 설계 = 기획/기획서.md 5절 -->
-<script>window.APP_VERSION = "0.1.0 \u00b7 a72adea4";</script>
+<script>window.APP_VERSION = "0.1.0 \u00b7 4e8cebd4";</script>
 <script>
 /* 날짜 · id · 작은 도구. 날짜는 늘 'YYYY-MM-DD' 글자(기기 시간대 기준)로 다룬다. */
 window.App = window.App || {};
@@ -4295,7 +4295,7 @@ App.screens.calendar = (function () {
     }
     if (!ghost) keys(g);
     /* 꼬리 그어지기는 한 번만 — 캘린더에 들어올 때 · 달이 바뀔 때. 같은 달을 다시 그릴 때(체크 등)는 안 돎 */
-    if (!ghost && drawKey !== st.y + '-' + st.m) { drawKey = st.y + '-' + st.m; g.classList.add('is-draw'); }
+    /* 띠 '그어지기' 효과는 뺐다 — 달 넘길 때마다 다시 그리며 렉 · 글자가 끊겨 나타나던 것 (사용자 10-31 '렉이라는 건 이 앱에 존재하면 안 됨'). 띠 · 글자는 처음부터 제자리 */
     return g;
   }
   var drawKey = null;
@@ -4408,11 +4408,12 @@ App.screens.calendar = (function () {
       setTimeout(function () { sc.classList.remove('is-rising'); }, 360);
       return;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    screen.classList.add('is-morph');
-    void screen.offsetWidth;
-    screen.classList.toggle('is-big', on);
-    setTimeout(function () { screen.classList.remove('is-morph'); App.render.now(); }, 360);
+    /* 크게 보기로도 칸 높이를 애니메이션하지 않음 — 한 번에 그리고 칸만 아주 짧게 투명도(가벼운 효과)로 (높이 애니메이션 = 42칸 레이아웃 매 프레임 = 렉) */
+    window.scrollTo(0, 0);
+    App.render.now();
+    var sb = document.querySelector('.screen-cal'); if (!sb) return;
+    sb.classList.add('is-expanding');
+    setTimeout(function () { sb.classList.remove('is-expanding'); }, 260);
   }
   /* 손잡이: 아래로 끌면 목록이 손가락을 따라 내려가다 놓으면 크게 · 위로 끌면 작게 · 누르면 바꿈 */
   function grabber(btn, screen) {
