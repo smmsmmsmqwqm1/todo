@@ -992,15 +992,23 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .cal-wdots > .cal-dots { position: relative; padding-top: var(--cal-mark-top, 36px); }
 .cal-wdots > .cal-dots.is-sel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: var(--cal-cell-h, 48px); border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); z-index: -1; }
 .cal-wpeek { display: none; bottom: 0; overflow: hidden; }   /* 큰 칸보다 긴 꼬리표는 칸 안에서 잘림(작은 폰 · 최소 64px 칸) */
-.cal-wcol { display: flex; flex-direction: column; gap: 3px; min-width: 0; min-height: 0; overflow: hidden; }
-.cal-wcol.is-other { opacity: .4; }
+/* 칸 열은 세로만 자름(칸 높이 밖 꼬리표) · 가로는 보임 — 여러 날 띠 제목(.cal-lane-t)이 이어지는 칸까지 넓게 그려져도 첫 칸에서 잘리지 않게 (사용자 11-02 '광고 리포트 · 부산 여행 잘림').
+   overflow-y: clip은 한 축만 자름(옛 브라우저는 앞의 hidden이 남아 지금처럼 잘린 채) · 쌓임 맥락을 만들지 않아 제목이 뒤 칸 띠 위에 얹힘 */
+.cal-wcol { display: flex; flex-direction: column; gap: 3px; min-width: 0; min-height: 0; overflow: hidden; overflow-x: visible; overflow-y: clip; }
+/* 앞뒤 달 칸 흐림은 칸 통째(opacity — 쌓임 맥락이 생겨 그 칸에서 시작한 띠 제목이 이번 달 칸까지 흐려지고 뒤 칸 띠에 덮임)가 아니라 안의 글 · 띠 바탕에만 */
+.cal-wcol.is-other > :is(.cal-hol, .cal-peeks) { opacity: .4; }
+.cal-wcol.is-other .cal-lane:not(.is-empty) { background: color-mix(in srgb, var(--c) 9%, transparent); }
+.cal-wcol.is-other .cal-lane.is-start::before { opacity: .4; }
+.cal-wcol.is-other .cal-lane-t { color: var(--ink-3); }   /* 앞뒤 달에서 시작한 띠 제목은 흐린 글색(겹 흐림 없이 · 이번 달 칸으로 넘어가도 읽힘) */
 .cal-peeks { overflow: hidden; }
-.cal-peeks { gap: calc(1px * var(--text-scale, 1)); padding: 0 4px; }
-.cal-peek { display: flex; align-items: center; gap: 3px; min-width: 0; height: calc(14px * var(--text-scale, 1)); font-size: 0.6563rem; font-weight: 500; line-height: 1; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-align: left; }
+/* 표식(9px 칸)과 제목 사이 · 칸 왼쪽 여백을 줄여 좁은 칸에 글자가 더 보이게 — 제목 첫 글자는 꼬리표 · 띠 제목 모두 칸 왼쪽에서 14px 한 세로줄 (사용자 11-02 '공과 글자가 너무 멀고 페이드되는 글자가 많음') */
+.cal-peeks { gap: calc(1px * var(--text-scale, 1)); padding: 0 2px 0 3px; }
+.cal-peek { display: flex; align-items: center; gap: 2px; min-width: 0; height: calc(14px * var(--text-scale, 1)); font-size: 0.6563rem; font-weight: 500; line-height: 1; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-align: left; }
 /* 제목 칸은 늘 칸 오른쪽 끝까지(flex 1) + 흐림은 그 끝 14px에만 — 짧은 제목은 끝에 닿지 않아 처음부터 또렷, 긴 제목만 처음 그려질 때부터 흐림.
    (옛: 그린 뒤 재서 흐림을 덧씌움 → 첫 장면엔 흐림이 없다가 생기는 깜빡임 · 사용자 10-31) */
-.pk-t { flex: 1 1 auto; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); }
-.cal-lane-t { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); }
+/* 끝 흐림 8px(옛 14px — 좁은 칸에서 남는 글자 둘 중 하나가 흐려 '페이드된 글자가 많다' · 11-02) */
+.pk-t { flex: 1 1 auto; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 8px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 8px), transparent); }
+.cal-lane-t { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 8px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 8px), transparent); }
 .pk-dot { flex: none; width: 5px; height: 5px; margin: 0 2px; border-radius: 50%; background: var(--c); }   /* 표식 칸 = 9px 고정(점 5 + 양옆 2) — 점 · 깃발 · 이모지 어느 것이든 제목 첫 글자가 한 세로줄에 (사용자 10-31 '글자 시작 위치가 달라 어색') */
 .pk-dot.is-done { opacity: .4; }   /* 끝낸 일 = 같은 점을 흐리게 — 속 빈 고리는 앱에서 '안 한 일(빈 동그라미)'의 뜻이라 거꾸로 읽힘 · 지난 날이 빈 고리투성이면 다그치는 느낌 */
 .pk-flag { flex: none; width: 9px; display: grid; place-items: center; color: var(--flag); }
@@ -1008,25 +1016,26 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .pk-flag svg path:last-child { fill: currentColor; }
 .pk-emoji { flex: none; width: 9px; display: grid; place-items: center; font-size: 9px; line-height: 1; overflow: visible; }
 .cal-peek.is-done { color: var(--ink-3); }
-.cal-more { font-size: 0.625rem; font-weight: 600; color: var(--ink-3); text-align: left; padding-left: 8px; height: calc(13px * var(--text-scale, 1)); line-height: calc(13px * var(--text-scale, 1)); }
+.cal-more { font-size: 0.625rem; font-weight: 600; color: var(--ink-3); text-align: left; padding-left: 11px; height: calc(13px * var(--text-scale, 1)); line-height: calc(13px * var(--text-scale, 1)); }
 /* 기간 띠(크게 보기 · 넓은 화면) — 목록 색을 옅게 섞은 띠, 첫날은 점이 앞에 서고 마지막 날은 둥글게 닫힘 */
 .cal-lanes { gap: 1px; }
 .cal-lane { position: relative; display: flex; align-items: center; height: calc(13px * var(--text-scale, 1)); background: color-mix(in srgb, var(--c) 20%, transparent); min-width: 0; overflow: hidden; }
 .cal-lane.is-empty { background: none; }
-.cal-lane.is-start { margin-left: 1px; border-radius: 7px 0 0 7px; padding-left: 12px; }
-.cal-lane.is-start::before { content: ''; position: absolute; left: 5px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: var(--c); }   /* 꼬리의 머리 = 점 (꼬리표 점과 같은 말) */
+.cal-lane.is-start { margin-left: 1px; border-radius: 7px 0 0 7px; padding-left: 10px; }
+.cal-lane.is-start::before { content: ''; position: absolute; left: 4px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: var(--c); }   /* 꼬리의 머리 = 점 (꼬리표 점과 같은 말) */
 .cal-lane.is-end { margin-right: 4px; border-radius: 0 7px 7px 0; }
 .cal-lane-t { padding-left: 3px; font-size: 0.625rem; font-weight: 500; color: var(--ink-2); white-space: nowrap; overflow: hidden; }
-.cal-lane:not(.is-start) .cal-lane-t { padding-left: 16px; }
-/* 띠 제목은 그 주 안 이어지는 칸까지 넓게 — 뒤 칸 띠 위에 얹힘(z-index) */
+.cal-lane:not(.is-start) .cal-lane-t { padding-left: 14px; }
+/* 띠 제목은 그 주 안 이어지는 칸까지 넓게 — 뒤 칸 띠 위에 얹힘(z-index). 첫 글자 = 칸 왼쪽 14px(꼬리표 제목과 한 세로줄: 첫날 1 + 10 + 3 · 주 첫 칸 14) */
 .cal-lane { overflow: visible; }
-.cal-lane-t { position: absolute; z-index: 2; top: 0; bottom: 0; display: flex; align-items: center; left: 12px; width: calc(var(--run, 1) * 100% - 16px); padding-left: 3px; }
+.cal-lane-t { position: absolute; z-index: 2; top: 0; bottom: 0; display: flex; align-items: center; left: 10px; width: calc(var(--run, 1) * 100% - 14px); padding-left: 3px; }
 .cal-lane:not(.is-start) .cal-lane-t { left: 0; width: calc(var(--run, 1) * 100% - 4px); }
 .list-row.is-lifted, .list-row.is-dragging { background: var(--surface-2); }   /* 주 첫 칸에 다시 쓰는 제목도 꼬리표 제목과 같은 세로줄 */
 /* 작은 보기(아래 목록이 올라온 상태)는 기간 선 없이 점 · 중요 표시만 (사용자 10-31). 기간은 크게 보기의 띠 · 고른 날 목록 '이어지는 일'(11월 3일~7일 · n일째)에서 */
 .cal-cell { height: calc(50px * var(--text-scale, 1)); }
 /* 어두운 두 화면에선 띠를 조금 더 진하게(20% → 28%) — 칙칙하게 가라앉던 것 */
 :root:is([data-theme="dark"], [data-theme="graphite"]) .cal-lane:not(.is-empty) { background: color-mix(in srgb, var(--c) 28%, transparent); }
+:root:is([data-theme="dark"], [data-theme="graphite"]) .cal-wcol.is-other .cal-lane:not(.is-empty) { background: color-mix(in srgb, var(--c) 12%, transparent); }   /* 앞뒤 달 칸 띠 = 옛 40% 흐림과 비슷한 옅기 */
 @media (min-width: 1100px) {
   .cal-peek { height: 16px; font-size: 0.75rem; }
   .cal-lane { height: 15px; }
@@ -1376,7 +1385,7 @@ html[data-text="xl"] .ob-choice { flex-direction: row; justify-content: flex-sta
 <div id="toast" class="toast-host" aria-live="polite"></div>
 
 <!-- 불러오는 순서 = 층 순서. 아래층(core · domain)은 위층(screens)을 모른다. 설계 = 기획/기획서.md 5절 -->
-<script>window.APP_VERSION = "0.1.0 \u00b7 b158bd0d";</script>
+<script>window.APP_VERSION = "0.1.0 \u00b7 2c467f6f";</script>
 <script>
 /* 날짜 · id · 작은 도구. 날짜는 늘 'YYYY-MM-DD' 글자(기기 시간대 기준)로 다룬다. */
 window.App = window.App || {};
@@ -3937,7 +3946,15 @@ App.dom = (function () {
     el.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
   }
   function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
-  function autosize(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+  /* 글 칸 높이를 글에 맞춤. 재려고 잠깐 'auto'로 줄이는 사이 창 안 스크롤이 위로 당겨지면(아이폰 사파리) 원래 자리로 — 글자 하나 칠 때마다 창이 위아래로 튀어 번쩍이던 것 (11-02).
+     높이가 그대로면 손대지 않음 */
+  function autosize(ta) {
+    var sc = ta.closest && ta.closest('.sheet-body'), top = sc ? sc.scrollTop : 0, was = ta.style.height;
+    ta.style.height = 'auto';
+    var want = ta.scrollHeight + 'px';
+    ta.style.height = want === was ? was : want;
+    if (sc && sc.scrollTop !== top) sc.scrollTop = top;
+  }
   return { h: h, clear: clear, add: add, autosize: autosize };
 })();
 
@@ -6066,9 +6083,14 @@ App.screens.calendar = (function () {
       /* 띠 줄 수 = 칸 4줄(ROWS)에서 '일 제목 한 줄 + +n 한 줄'(2줄)과 공휴일 이름 줄을 남긴 만큼까지 — 띠 · 이름이 자리를 다 먹어 '+n'만 덩그러니 남지 않게
          (휴대폰 · 넓은 화면 같은 규칙 · 15호 재확인 · 못 그린 띠는 '+n'에 셈) */
       var w = Math.floor(idx / 7), nl = Math.max(0, Math.min(weekLanes[w] || 0, LANES, ROWS - 2 - (weekHol[w] ? 1 : 0))), lanes = null, laneTasks = {}, hiddenSpans = 0;
-      if (weekLanes[w]) {
+      /* 이 칸이 실제로 쓰는 띠 줄 수(colN) = 그날 지나가는 띠의 가장 아래 줄 번호 + 1 (nl 안에서). 그 아래 빈 줄은 만들지 않음 —
+         그 주에 띠가 하나라도 있으면 띠 없는 날도 빈 줄을 비워 두고 꼬리표가 둘째 줄부터 채워지던 것 (사용자 11-02 · 설계 조수).
+         띠 높이는 줄 번호로 맞춰지므로(같은 번호 = 같은 높이) 아래 빈 줄을 빼도 띠 이어짐은 그대로. 중간 빈 줄(0번 비고 1번에 띠)은 높이를 맞추려 둠 */
+      var colN = 0;
+      spans.forEach(function (x) { var kk = lane[s + '|' + x.task.id]; if (kk != null && kk < nl && kk + 1 > colN) colN = kk + 1; });
+      if (colN) {
         var slots = [];
-        for (var k = 0; k < nl; k++) slots.push(null);   /* nl이 0이면(공휴일 주 · 띠 1줄 자리) 띠는 모두 '+n'으로 */
+        for (var k = 0; k < colN; k++) slots.push(null);
         spans.forEach(function (x) {
           var k2 = lane[s + '|' + x.task.id]; if (k2 == null) return; laneTasks[x.task.id] = 1;
           if (k2 >= nl) { hiddenSpans++; return; }   /* 줄이 모자라 못 그린 기간 일은 '+n'에 셈 (말없이 사라지지 않게) */
@@ -6079,7 +6101,9 @@ App.screens.calendar = (function () {
             isStart || (wkStart && x.start < s) ? h('span.cal-lane-t', { style: { '--run': String(U.diffDays(s, x.end < dates[w * 7 + 6] ? x.end : dates[w * 7 + 6]) + 1) } }, x.task.title) : null);
         });
         lanes = h('span.cal-lanes', { 'aria-hidden': 'true' }, slots.map(function (x) { return x || h('span.cal-lane.is-empty'); }));
-      }
+      } else spans.forEach(function (x) { var k3 = lane[s + '|' + x.task.id]; if (k3 == null) return; laneTasks[x.task.id] = 1; hiddenSpans++; });   /* 줄 자리가 없어 그날 띠를 하나도 못 그리면(공휴일 주 · 낮은 칸) 모두 '+n'으로 */
+      /* 공휴일 이름 줄: 그날이 공휴일이거나 그날 띠가 있을 때만(띠 높이를 그 주 다른 띠 칸과 맞추려) — 띠도 공휴일도 없는 날까지 빈 이름 줄이 맨 위를 차지하던 것 (11-02 설계 조수) */
+      var hasHol = weekHol[w] && (!!hn || colN > 0);
       /* 꼬리표 줄 차례 = 그날을 눌렀을 때 아래 목록과 같은 차례(시간 정한 일 → 시간 없는 일 → 반복)에서, 중요만 맨 앞 · 끝낸 일은 맨 뒤
          (사용자 11-01 '칸 미리 보기 순서대로 안 나오는 건 어색' → 지우기 · 순서 조수: 칸은 4줄짜리 요약이라 중요만 예외).
          띠로 이미 보인 기간 일은 뺌. 남은 줄이 모자라면 마지막 줄은 '+n' */
@@ -6090,7 +6114,7 @@ App.screens.calendar = (function () {
       its.sort(function (a, b) { return (Q.done(a.it) - Q.done(b.it)) || ((b.it.task.priority ? 1 : 0) - (a.it.task.priority ? 1 : 0)) || (grp(a.it.task) - grp(b.it.task)) || (a.i - b.i); });
       its = its.map(function (x) { return x.it; });
       if (its.length || hiddenSpans) {
-        var room = Math.max(1, ROWS - nl - (weekHol[w] ? 1 : 0)), more = its.length + hiddenSpans, show = more > room ? room - 1 : its.length;
+        var room = Math.max(1, ROWS - colN - (hasHol ? 1 : 0)), more = its.length + hiddenSpans, show = more > room ? room - 1 : its.length;
         peek = h('span.cal-peeks', { 'aria-hidden': 'true' }, its.slice(0, show).map(function (it) {
           var dn = Q.done(it);
           return h('span.cal-peek' + (dn ? '.is-done' : ''), mark(it.task, dn), h('span.pk-t', it.task.title));
@@ -6110,7 +6134,7 @@ App.screens.calendar = (function () {
       var wk = Math.floor(idx / 7);
       /* 고른 날 상자도 점 겹에(칸 크기 · 숫자 밑) — 전환 때 점과 같이 옅어지는 게 합성만으로 끝나게 (모션 점검원 구현 검토 3) */
       wdots[wk].appendChild(h('span.cal-dots' + (s === st.sel && s !== today ? '.is-sel' : ''), { 'data-day': s }, dots));
-      wpeek[wk].appendChild(h('span.cal-wcol' + (other ? '.is-other' : ''), weekHol[wk] ? h('span.cal-hol', hn) : null, lanes, peek));
+      wpeek[wk].appendChild(h('span.cal-wcol' + (other ? '.is-other' : ''), hasHol ? h('span.cal-hol', hn) : null, lanes, peek));
       if (s === st.sel) weeks[wk].classList.add('has-sel');
       /* 날짜 칸 꾹 누르기 = 그날을 고르고 빠른 추가 바로 (캘린더 앱 습관 · 메뉴 없이 · 꾹 누르기 자리 조수 10-31) */
       if (!ghost) App.row.longPress(cellEl, function () {
@@ -6904,9 +6928,15 @@ App.detail = (function () {
       requestAnimationFrame(function () { App.dom.autosize(title); App.dom.autosize(note); });
     }
 
+    /* '세부 할 일 넣기' 칸은 창을 여는 동안 한 번만 만들고, 다시 그릴 때는 그 위의 세부 줄만 바꿔 끼운다.
+       칸까지 새로 만들면 초점이 있던 입력 칸이 사라져 아이폰 키보드가 내려갔다 새 칸에서 다시 올라오며 화면이 번쩍였음 —
+       엔터(완료)로 세부를 넣고 다음 줄을 이어 쓸 때마다 (사용자 11-02 아이폰). 같은 칸이 초점을 그대로 지니면 키보드가 움직이지 않음 */
+    var addRow = null;
     function drawSubs() {
       var tk = cur();
-      App.dom.clear(subsBox);
+      if (!addRow) addRow = makeAddRow();
+      [].slice.call(subsBox.children).forEach(function (c) { if (c !== addRow) subsBox.removeChild(c); });
+      if (addRow.parentNode !== subsBox) subsBox.appendChild(addRow);
       tk.subtasks.forEach(function (s) {
         var pw = App.row.pendingSub(id, key, s.id), on = pw != null ? pw : T.isSubDone(tk, key, s.id);   /* 저장을 기다리는 체크는 누른 대로 (뒤 줄과 같은 표 · 20호) */
         var c = h('button.check.sm' + (on ? '.is-on' : ''), { type: 'button', role: 'checkbox', 'aria-checked': on ? 'true' : 'false', 'aria-label': s.title, html: App.icons.CHECK });
@@ -6945,8 +6975,10 @@ App.detail = (function () {
           label.textContent = v; label.setAttribute('aria-label', v + ', ' + t('common.edit')); c.setAttribute('aria-label', v);
           if (input.parentNode === line) line.replaceChild(label, input);   /* 고치기를 마치면 다시 글자 줄(끌 수 있게) */
         });
-        subsBox.appendChild(line);
+        subsBox.insertBefore(line, addRow);
       });
+    }
+    function makeAddRow() {
       var add = h('input.sub-input.is-new', { type: 'text', placeholder: t('detail.addSub'), enterkeyhint: 'next', 'aria-label': t('detail.addSub') });
       add.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.isComposing) {
@@ -6954,8 +6986,7 @@ App.detail = (function () {
           var v = add.value.trim(); if (!v) return;
           add.value = '';  /* 칸을 지울 때 blur가 또 넣지 않게 먼저 비운다 */
           S.commit(function (d) { T.addSub(d, id, v); });
-          drawSubs();
-          var next = subsBox.querySelector('.is-new'); if (next) next.focus();
+          drawSubs();   /* 같은 칸이 남아 초점 · 키보드 그대로 — 다음 줄을 바로 이어 씀 */
         }
       });
       add.addEventListener('blur', function () { var v = add.value.trim(); if (v) { add.value = ''; S.commit(function (d) { T.addSub(d, id, v); }); drawSubs(); } });
@@ -6969,7 +7000,7 @@ App.detail = (function () {
         drawSubs();
         App.toast.show(t('detail.subsPasted', { n: lines.length }), { action: t('common.undo'), onAction: function () { S.undo(); draw(); } });
       });
-      subsBox.appendChild(h('div.sub-edit.is-add', h('span.sub-plus', { html: ic('plus', 18) }), add));
+      return h('div.sub-edit.is-add', h('span.sub-plus', { html: ic('plus', 18) }), add);
     }
 
     function removeSub(s) {
@@ -7995,7 +8026,15 @@ App.onboarding = (function () {
     if (queued) return;
     queued = requestAnimationFrame(function () { queued = 0; App.whenFree(drawLater); });
   };
-  function drawLater() { draw(false); }   /* 같은 함수 하나 — 미뤄 둔 사이 여러 번 불러도 손을 뗀 뒤 한 번만 그림 */
+  /* 창(자세히 · 빠른 추가 · 세부 등)의 입력 칸에 쓰는 중이면 뒤 화면은 다시 그리지 않고, 입력에서 나올 때 한 번 그린다.
+     뒤 화면은 창 · 어둠막에 가려 안 보이는데, 쓰는 중 저장마다 통째로 다시 그리며 스크롤을 되돌려 아이폰이 키보드 위로 맞춰 둔 화면이 흔들려 번쩍였음 (사용자 11-02 아이폰) */
+  var drawAfterTyping = false;
+  function typingInSheet() { var a = document.activeElement; return !!(App.sheet.count && a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && a.closest && a.closest('.sheet')); }
+  function drawLater() { if (typingInSheet()) { drawAfterTyping = true; return; } draw(false); }   /* 같은 함수 하나 — 미뤄 둔 사이 여러 번 불러도 손을 뗀 뒤 한 번만 그림 */
+  document.addEventListener('focusout', function () {
+    if (!drawAfterTyping) return;
+    setTimeout(function () { if (drawAfterTyping && !typingInSheet()) { drawAfterTyping = false; App.render(); } }, 0);   /* 같은 창의 다음 칸으로 옮긴 거면 계속 미룸 */
+  }, true);
   /* 그 자리에서 바로 (스크롤 유지) — 앞뒤 자리를 재는 부드러운 이동(flip)용. 기다리던 그리기는 취소해 같은 화면을 두 번 그리지 않음(움직이던 줄이 뚝 끝나지 않게) */
   App.render.now = function () { if (queued) cancelAnimationFrame(queued); queued = 0; afterUp = afterUp.filter(function (f) { return f !== drawLater; }); draw(false); };   /* 미뤄 둔 그리기는 빼서 손을 뗀 뒤 한 번 더 그려 움직이던 줄이 끊기지 않게 (10호 재확인) */   /* 그 자리에서 바로 (스크롤 유지) — 가라앉기 애니메이션이 앞뒤 자리를 재려고 */
   function draw(top) {
@@ -8019,7 +8058,9 @@ App.onboarding = (function () {
     navDir = 0;
     drawNav();
     fab.classList.toggle('is-hidden', r.name === 'settings' || r.name === 'set');  /* 넓은 화면의 떠 있는 + (휴대폰은 아래 탭 가운데 +) */
-    window.scrollTo(0, top ? restoreY : y); restoreY = 0;
+    /* 화면을 옮겼으면 기억한 자리로 · 같은 화면을 다시 그렸으면 자리가 바뀐 때만 되돌림 — 필요 없는 스크롤 지시는 아이폰에서 키보드 위 화면을 흔듦 (11-02) */
+    if (top) window.scrollTo(0, restoreY); else if (window.scrollY !== y) window.scrollTo(0, y);
+    restoreY = 0;
   }
 
   function navOn(cls, name, arg) { return route.name === name && (arg === undefined || route.arg === arg) || (name === 'lists' && route.name === 'list' && cls === 'tab') || (name === 'settings' && route.name === 'set'); }
