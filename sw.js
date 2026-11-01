@@ -1,10 +1,11 @@
 /* 서비스 워커 — 앱 파일을 기기에 담아 두어 인터넷 없이도 열린다. build.py가 아래 두 줄을 채운다.
    판이 바뀌면 CACHE 이름이 바뀌어, 다음에 열 때 말없이 새 판으로 바뀐다(할 일 데이터는 localStorage라 그대로). */
-var CACHE = 'todo02-be9985d7';
+var CACHE = 'todo02-e9a9f153';
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
+  /* cache: 'reload' = 브라우저의 HTTP 캐시를 건너뛰고 서버에서 새로 받음 — 옛 index.html이 새 캐시 이름으로 굳던 길 (새 눈 5호 5번) */
+  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (keys) {
@@ -19,7 +20,9 @@ self.addEventListener('fetch', function (e) {
 self.addEventListener('notificationclick', function (e) {
   e.notification.close();
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
-    for (var i = 0; i < list.length; i++) if ('focus' in list[i]) return list[i].focus();
+    var d = e.notification.data || {};
+    /* 열린 앱이 있으면 앞으로 + 그 할 일 열기(안드로이드와 같게 · 새 눈 9호) */
+    for (var i = 0; i < list.length; i++) if ('focus' in list[i]) { try { list[i].postMessage({ type: 'open-task', taskId: d.taskId, key: d.key }); } catch (x) {} return list[i].focus(); }
     if (self.clients.openWindow) return self.clients.openWindow('./');
   }));
 });
