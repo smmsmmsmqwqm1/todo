@@ -246,7 +246,7 @@ svg { display: block; flex: none; }
   flex: 1; min-width: 0; max-width: 96px;
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   padding: 6px 0 4px; border-radius: 12px;
-  color: var(--ink-2); font-size: 0.7188rem; font-weight: 600;  /* 안 고른 탭도 '꺼진 것'처럼 보이지 않게 */
+  color: var(--ink-2); font-size: min(0.7188rem, 12.5px); font-weight: 600;  /* 안 고른 탭도 '꺼진 것'처럼 보이지 않게 · 탭 이름은 12.5px까지만 커짐(폰 탭 줄 관례) — 좁은 폰 · 큰 글자 영어에서 'Calen…'으로 잘리던 것 (구역 5) */
   transition: color var(--fast), transform var(--fast) var(--ease);
 }
 .tab:active { transform: scale(.94); }
@@ -337,8 +337,8 @@ svg { display: block; flex: none; }
 }
 .icon-btn:active { background: var(--press); transform: scale(.94); }
 /* 손가락 닿는 넓이 44 — 보이는 크기는 그대로, 체크 동그라미처럼 ::before로 넓힘 (18호: 40 · 32 · 22 · 30 · 34px이던 단추들) */
-.icon-btn, .back-btn, .drag-tip button, .qa-keep, .qa-flag { position: relative; }
-.icon-btn::before, .back-btn::before, .drag-tip button::before, .qa-keep::before, .qa-flag::before { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+.icon-btn, .back-btn, .drag-tip button, .qa-keep, .qa-flag, .progress-row.is-tap, .day-count.is-tap { position: relative; }
+.icon-btn::before, .back-btn::before, .drag-tip button::before, .qa-keep::before, .qa-flag::before, .progress-row.is-tap::before, .day-count.is-tap::before { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
 @media (hover: hover) { .icon-btn:hover { background: var(--surface-2); } }
 
 /* 오늘 한 비율 고리 */
@@ -367,6 +367,7 @@ svg { display: block; flex: none; }
 .task-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 2px; font-size: var(--fs-small); color: var(--ink-2); }
 .meta { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .meta .dot { width: 7px; height: 7px; border-radius: 50%; }
+.meta-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .meta.is-late { color: var(--ink-2); }
 .task-expand { width: 32px; height: 32px; margin: -4px -6px -4px 0; border-radius: 10px; display: grid; place-items: center; color: var(--ink-3); transition: transform var(--mid) var(--ease); }
 .task-expand.is-open { transform: rotate(180deg); }
@@ -439,9 +440,9 @@ html.is-reordering, html.is-reordering * { cursor: grabbing !important; -webkit-
 .task.is-done .title-imp i { background: var(--ink-3); box-shadow: none; }
 /* 목록 색 고르기: 지금 주 색(체크 색)과 같은 색은 흐리게 — 막지 않고 알림 한 줄 */
 .swatch.is-accent:not(.is-on) { opacity: .4; }
-.pick-note { margin: 8px 2px 0; font-size: var(--fs-small); color: var(--ink-3t); }
+.swatch-note { margin: 8px 2px 0; font-size: var(--fs-small); color: var(--ink-3t); }   /* 목록 색 견본 밑 안내 — 날짜 창 안내(.pick-note)와 이름이 같아 뒤 규칙이 이겨 견본에 붙어 보이던 것 (구역 5 참고) */
 /* 설정 화면 색 고르기의 작은 견본 점 — '그라파이트'가 어떤 색인지 글자만으로는 모르던 것 (선택지 점검원 7번) */
-.seg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; box-shadow: 0 0 0 1px var(--line); }
+.seg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; box-shadow: 0 0 0 1px var(--ink-3); }   /* 테두리는 글자색 계열 — 어두운 화면에서 '그라파이트 · 어둡게' 점이 바탕에 묻히던 것 (구역 5 · 첫 실행 견본과 같게) */
 .seg-dot.is-light { background: #F2F2EF; } .seg-dot.is-graphite { background: #2B2B2D; } .seg-dot.is-dark { background: #121314; }
 /* 켜기/끄기 작은 스위치 (자세히 창 '중요') */
 .mini-switch { position: relative; flex: none; width: 42px; height: 26px; border-radius: 13px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); transition: background var(--fast); margin-left: auto; }
@@ -450,7 +451,6 @@ html.is-reordering, html.is-reordering * { cursor: grabbing !important; -webkit-
 .prop-toggle[aria-checked="true"] .mini-switch { background: var(--accent); box-shadow: none; }
 .prop-toggle[aria-checked="true"] .mini-switch::after { transform: translateX(16px); background: #fff; }
 .prop-toggle.is-flag-on .mini-switch { background: var(--flag); }   /* 중요만 깃발 색 */
-.prop-toggle.is-flag-on .prop-icon { color: var(--flag); }
 .menu-hint { margin: 0 2px 10px; font-size: var(--fs-small); color: var(--ink-3t); text-align: center; }
 
 /* 체크 동그라미 */
@@ -470,6 +470,7 @@ html.is-reordering, html.is-reordering * { cursor: grabbing !important; -webkit-
 .title-flag { display: inline-flex; vertical-align: -1px; margin-left: 6px; color: var(--flag); }
 .task.is-done .title-flag { color: var(--ink-3); }
 /* 둘째 줄이 아이콘 하나뿐이면 제목 끝으로(row.js meta → inline) — 매일 반복 · 종 · 메모 표시 */
+.title-tail { white-space: nowrap; }   /* 마지막 낱말 + 제목 끝 표시가 같이 줄을 넘음 (row.js titleParts · 11-15) */
 .title-icons { display: inline-flex; gap: 5px; vertical-align: -1px; margin-left: 6px; color: var(--ink-3); }
 .title-icons .meta { display: inline-flex; padding: 0; background: none; }
 .meta-bell { color: var(--ink-2); }
@@ -544,6 +545,13 @@ textarea.field { resize: none; line-height: 1.45; }
 .prop { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 54px; padding: 0 12px 0 16px; text-align: left; background: var(--surface); transition: background var(--fast); }
 .prop:active { background: var(--press); }
 .prop-icon { color: var(--ink-2); }
+/* 줄 앞 표시 칸 하나(11-16 · 사용자 '목록의 목 첫 글자 · 그 앞 파란 공 위치가 위아래 줄과 세로열이 안 맞음') —
+   아이콘(20px) · 목록 색 점(12px) · 이모지(글자 크기 따라 커짐) · 사진(22px)이 각자 제 크기만큼 자리를 먹어, 표시 종류가 바뀌면 글 첫 글자가 밀리고
+   점이 아이콘 가운데 줄에서 벗어났음. 모든 줄 앞 표시를 같은 폭 칸 가운데에 둔다 → 표시 가운데 · 글 첫 글자가 늘 같은 세로줄.
+   칸 폭 = 아이콘 상자 24px(글자를 키우면 이모지가 들어가게 1.375rem까지). 목록 화면 줄은 사진 · 이모지가 30px이라 그 줄만 30px */
+:root { --lead: max(24px, 1.375rem); }
+.prop-icon, .side-item .nav-ico, .flag-toggle .flag-ico { flex: none; width: var(--lead); display: inline-grid; place-items: center; }
+.list-row { --lead: max(30px, 1.375rem); }
 /* 이름 칸 · 값 칸 모두 min-width 0 + 값은 줄의 55%까지 — 긴 값(영어 '매 2주 월 · 수 · 금')이 이름 칸을 한 낱말 폭으로 찌그러뜨려 보조 줄이 세로로 쌓이던 것,
    띄어쓰기 없는 긴 이름이 오른쪽 ×·›·'되살리기'를 밀어내던 것 (11-01 화면 깨짐 점검) */
 .prop-label { flex: 1; font-size: 1rem; padding: 10px 0; }   /* 이름 칸은 가장 긴 낱말 폭을 지킴 — 값 칸이 양보 (재판정: min-width 0이면 'Repeat starts'가 다시 세로로) */
@@ -562,6 +570,7 @@ textarea.field { resize: none; line-height: 1.45; }
 .prop-value { min-width: 0; max-width: 55%; font-size: 0.9375rem; color: var(--ink-2); text-align: right; overflow-wrap: anywhere; }
 .prop-value.is-empty { color: var(--ink-3); display: grid; place-items: center; }
 .prop.is-set .prop-icon { color: var(--accent-ink); }
+.prop.prop-toggle.is-flag-on .prop-icon { color: var(--flag); }   /* 중요를 켜면 아이콘도 깃발 색 — 바로 위 규칙과 무게가 같아 주 색이 이기던 것 (구역 3) */
 .prop.is-set .prop-value { color: var(--ink); font-weight: 600; }
 .prop-clear { width: 32px; height: 32px; margin-right: -4px; border-radius: 10px; display: grid; place-items: center; color: var(--ink-3); }
 .prop-clear:active { background: var(--surface-2); }
@@ -572,6 +581,9 @@ textarea.field { resize: none; line-height: 1.45; }
 .seg { display: flex; padding: 3px; gap: 3px; border-radius: 12px; background: var(--surface-2); }
 /* 글자를 '아주 크게'로 키워도 칸을 넘치지 않게: 높이는 글자와 같이 늘고, 넘치면 낱말 단위로 두 줄 (1호 10번 재확인) */
 .seg button { flex: 1 1 0; min-width: 0; min-height: 2.375rem; padding: 4px 6px; border-radius: 9px; font-size: 0.9062rem; line-height: 1.2; font-weight: 650; color: var(--ink-2); transition: background var(--fast), color var(--fast); word-break: keep-all; overflow-wrap: anywhere; }
+/* 큰 글자: 칸이 낱말보다 좁아지면 낱말 중간('그라파이/트')을 끊지 않고 칸째 다음 줄로 (구역 5) */
+html[data-text="lg"] .seg, html[data-text="xl"] .seg { flex-wrap: wrap; }
+html[data-text="lg"] .seg button, html[data-text="xl"] .seg button { flex: 1 1 auto; overflow-wrap: break-word; }
 .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
 
 /* 선택 목록 (고르기 창 안) */
@@ -656,7 +668,9 @@ html.is-holding .tabbar .tab { opacity: .45; transition: opacity 160ms; }
 .task-wrap.is-trash .task { transform: scale(.94); transition: transform 160ms var(--ease); }
 @media (prefers-reduced-motion: reduce) { .trash-ball { transition: none; } }
 /* 세부 할 일 줄도 같은 손짓(reorder.js) — 목록에서 펼친 줄(.sub) · 자세히 창 줄(.sub-edit) */
-:is(.sub, .sub-edit)[data-drag] { position: relative; background: var(--surface); border-radius: 10px; }
+:is(.sub, .sub-edit)[data-drag] { position: relative; background: var(--surface); }
+/* 둥근 모서리는 들린 동안만 — 늘 둥글게 두면 줄 사이 가는 선(border-top)의 양 끝이 모서리를 따라 휘어 보였음 (11-14) */
+:is(.sub, .sub-edit):is(.is-lifted, .is-dragging, .is-settling, .is-free, .is-trash) { border-radius: 10px; }
 :is(.sub, .sub-edit).is-lifted { background: var(--surface-2); box-shadow: var(--shadow-float); z-index: 3; transition: background 160ms var(--ease); }
 :is(.sub, .sub-edit).is-dragging { z-index: 4; }
 :is(.sub, .sub-edit).is-shifting { transition: transform 180ms var(--ease); }
@@ -708,6 +722,8 @@ html.is-holding .tabbar .tab { opacity: .45; transition: opacity 160ms; }
 
 /* 방금 넣은 줄 — 1.4초 동안 주 색이 아주 옅게 스쳤다 사라짐 (빠른 추가가 닫힌 뒤 눈이 찾게) */
 .task.is-new { animation: task-new 1400ms var(--ease); }
+/* 방금 넣은 줄을 보이는 자리로 끌어올 때(row.js flash) '추가했어요' 띠와 아래 탭 줄 위까지 — 줄이 띠 밑에 깔려 '어디 들어갔지'가 그대로이던 것 (11-14) */
+.task.is-new { scroll-margin: 72px 0 calc(var(--safe-b) + 176px); }
 @keyframes task-new { 0%, 35% { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); } 100% { background: var(--surface); } }
 
 /* 업데이트 뒤 한 번 '새 버전' 안내 — 점 목록 몇 줄 + 마지막 안심 한 줄 */
@@ -758,14 +774,15 @@ html.is-holding .tabbar .tab { opacity: .45; transition: opacity 160ms; }
 
 /* 길게 누르기 메뉴 — 맨 위 중요도 색 한 줄(누르면 바로) · 날짜 칸 한 줄 · 그 아래 줄들 · 맨 아래 흐린 지우기 */
 /* 맨 위 '중요' 켜기/끄기 — 깃발 하나, 누르면 바로 (목록 색 동그라미와 모양 · 색이 겹치지 않게) */
-.flag-toggle { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 50px; margin: 2px 0 10px; padding: 0 16px; border-radius: 14px; background: var(--surface);
+.flag-toggle { display: flex; align-items: center; gap: 12px;   /* 아래 줄들(.opt)과 같은 간격 — 10px이라 '중요' 글이 아래 '시간 · 반복 · 목록'보다 2px 왼쪽이었음 (11-16) */ width: 100%; min-height: 50px; margin: 2px 0 10px; padding: 0 16px; border-radius: 14px; background: var(--surface);
   font-size: 1rem; font-weight: 650; color: var(--ink-2); transition: background var(--fast), color var(--fast), box-shadow var(--fast); }
 .flag-toggle:active { background: var(--press); }
-.flag-toggle .flag-ico { display: grid; color: var(--ink-3); transition: color var(--fast); }
-.flag-toggle .flag-state { margin-left: auto; font-size: 0.875rem; font-weight: 600; color: var(--ink-3t); }
-.flag-toggle.is-on { color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--flag); }
+.flag-toggle .flag-ico { color: var(--ink-3); transition: color var(--fast); }   /* 칸 모양은 위 '줄 앞 표시 칸' 규칙 */
+/* 켜짐 · 꺼짐은 자세히 창 '중요' 줄과 같은 스위치로 — 같은 것이 한쪽은 스위치, 한쪽은 '꺼짐' 글자 + 빨간 테두리이던 것 (11-14 · 하나의 개념 = 하나의 표현) */
+.flag-toggle.is-on { color: var(--ink); }
+.flag-toggle.is-on .mini-switch { background: var(--flag); box-shadow: none; }
+.flag-toggle.is-on .mini-switch::after { transform: translateX(16px); background: #fff; }
 .flag-toggle.is-on .flag-ico { color: var(--flag); animation: flag-pop 320ms var(--ease); }   /* 켜는 순간 깃발이 톡 — 바로 바뀌었다는 손맛 */
-.flag-toggle.is-on .flag-state { color: var(--flag); }
 @keyframes flag-pop { 0% { transform: scale(.88); } 100% { transform: none; } }   /* 비틀기 · 튕김 없이 살짝만 (모션 점검원 — 장난스러운 튕김은 원칙과 어긋남) */
 .chip.is-flag { background: color-mix(in srgb, var(--flag) 12%, transparent); color: var(--flag); }
 .menu-days { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; margin: 0 0 8px; }   /* 칸 2~4개를 늘 한 줄 같은 폭으로 — 글자를 키우면 '날짜 고르기'가 혼자 아랫줄로 떨어지던 것(3+1 · 18호) */
@@ -774,6 +791,7 @@ html.is-holding .tabbar .tab { opacity: .45; transition: opacity 160ms; }
 html[data-text="xl"] .menu-days { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 /* :has를 모르는 옛 웹뷰는 이 줄만 버리도록 따로 (같은 규칙에 묶으면 위 xl 2열까지 버림 · 18호 재확인 3) */
 html[data-text="lg"] .menu-days:has(> :nth-child(4)) { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 400px) { .menu-days:has(> :nth-child(4)) { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); } }   /* 좁은 폰에서 칸 4개면 2×2 — 한 칸 약 56px에 'Tomorrow'가 낱말 중간에서 끊기던 것 (구역 1) */
 html[data-text="xl"] .menu-days > :last-child:nth-child(odd) { grid-column: 1 / -1; }
 .menu-day-name, .menu-day-date { text-align: center; overflow-wrap: break-word; }
 .menu-day { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 58px; padding: 6px 4px; border-radius: 14px; background: var(--surface); transition: transform var(--fast) var(--ease), background var(--fast); }
@@ -787,6 +805,9 @@ html[data-text="xl"] .menu-days > :last-child:nth-child(odd) { grid-column: 1 / 
 /* 비어 있을 때 */
 .empty { text-align: center; padding: 48px 24px 32px; color: var(--ink-2); }
 .empty-mark { width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 22px; display: grid; place-items: center; background: var(--surface); color: var(--done); }
+/* 빈 오늘 화면의 + 는 진짜 단추 — 아래 탭 가운데 + 와 같은 모양이라 누르게 생겼는데 안 눌리던 것 (11-14) */
+button.empty-mark { transition: transform var(--fast) var(--ease), background var(--fast); }
+button.empty-mark:active { transform: scale(.94); background: var(--press); }
 .empty-title { font-size: 1.0938rem; font-weight: 700; color: var(--ink); margin: 0 0 4px; }
 .empty-text { font-size: 0.9375rem; margin: 0; }
 .empty-next { font-size: 0.9375rem; margin: 22px 0 10px; color: var(--ink); overflow-wrap: anywhere; }   /* 오늘이 비었을 때 가장 가까운 앞날 일 한 줄 (18호) */
@@ -795,7 +816,10 @@ html[data-text="xl"] .menu-days > :last-child:nth-child(odd) { grid-column: 1 / 
 /* 띠 안내 */
 .banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 14px 14px 16px; margin: 0 0 18px; border-radius: var(--r-card); background: var(--surface); font-size: 0.9062rem; color: var(--ink-2); }
 .banner b { color: var(--ink); font-weight: 700; }
-.banner-body { flex: 1; }
+.banner-body { flex: 1; min-width: 0; }
+.banner-title { display: block; }
+.banner-step { margin: 4px 0 0; color: var(--ink); font-weight: 500; }
+.banner-why { margin: 6px 0 0; font-size: var(--fs-small); color: var(--ink-2); }
 .banner .icon-btn { width: 32px; height: 32px; margin: -6px -6px 0 0; }
 
 /* 아래에서 올라오는 창 */
@@ -884,6 +908,8 @@ html[data-text="lg"] .toast-msg + .toast-action, html[data-text="xl"] .toast-msg
 .late-sec > .card { margin: 8px -4px 4px; }
 .late-sec .section-head { margin: 0; }
 .late-more { display: flex; justify-content: flex-end; padding: 4px 2px 2px; }
+.late-more .text-btn { color: var(--ink-2); }   /* 덜 쓰는 '모두 날짜 없이 두기'가 주 색이라 위의 '다 오늘로'(조용한 회색)보다 더 튀던 것 — 같은 결로 (11-14) */
+.late-more .text-btn:active { background: var(--press); }
 .skipped { margin: -16px 4px 24px; }
 .day-panel .skipped { margin: 8px 4px 0; }   /* 캘린더 고른 날: '이날 할 일이 없어요' 상자와 겹치지 않게 (4호 재확인) */
 .skipped-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 36px; color: var(--ink-3t); font-size: var(--fs-small); }
@@ -899,7 +925,8 @@ html[data-text="lg"] .toast-msg + .toast-action, html[data-text="xl"] .toast-msg
 /* 왼쪽 메뉴 */
 .side-brand { font-size: 1.25rem; font-weight: 800; letter-spacing: -.02em; padding: 4px 12px 18px; }
 /* 넓은 화면 '할 일 추가': 큰 주황 면 대신 흰 면 + 주 색 글자 (AI 티 진단 10-31) */
-.side-add { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 46px; margin: 0 0 14px; padding: 0 14px; border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--accent-ink); font-weight: 700; font-size: 0.9688rem; transition: transform var(--fast) var(--ease), background var(--fast); }
+.side-add { display: flex; align-items: center; gap: calc(var(--lead) / 2); width: 100%; min-height: 46px; margin: 0 0 14px; padding: 0 12px 0 calc(var(--lead) / 2);
+  /* + 네모(24px 고정) 가운데 · 글 첫 글자가 아래 메뉴 줄(왼쪽 12 + 표시 칸 --lead + 간격 12)과 같은 세로줄 — 표시 칸이 글자 크기 따라 넓어져도 맞게 왼쪽 여백 · 간격을 칸 폭의 반으로 (11-16) */ border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--accent-ink); font-weight: 700; font-size: 0.9688rem; transition: transform var(--fast) var(--ease), background var(--fast); }
 .side-add-plus { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--accent); color: var(--on-accent); }
 .side-add:active { transform: scale(.98); }
 @media (hover: none) { .side-kbd { display: none; } } /* 아이패드 터치에서는 단축키 표시 안 함 */
@@ -916,6 +943,7 @@ html[data-text="lg"] .toast-msg + .toast-action, html[data-text="xl"] .toast-msg
 
 /* 공통 작은 것 */
 .show-done { display: block; margin: -8px auto 22px; padding: 10px 16px; border-radius: var(--r-pill); font-size: 0.9062rem; font-weight: 650; color: var(--ink-2); background: var(--surface-2); }
+.card + .show-done { margin-top: 10px; }   /* 카드 바로 아래('n개 더 보기')는 겹치지 않게 — 묶음 사이에 올 때만 위로 당김 (구역 1) */
 .show-done:active { transform: scale(.97); }
 .back-btn { display: inline-flex; align-items: center; gap: 2px; margin: 0 0 6px -6px; padding: 6px 8px 6px 4px; border-radius: 10px; font-size: var(--fs-sub); font-weight: 650; color: var(--ink-2); }
 .back-btn:active { background: var(--press); }
@@ -1016,6 +1044,7 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .pk-flag svg path:last-child { fill: currentColor; }
 .pk-emoji { flex: none; width: 9px; display: grid; place-items: center; font-size: 9px; line-height: 1; overflow: visible; }
 .cal-peek.is-done { color: var(--ink-3); }
+.cal-peek.is-done :is(.pk-flag, .pk-imp, .pk-emoji) { opacity: .4; }   /* 끝낸 일은 중요 표시 · 이모지도 색 점처럼 흐리게 — 제목만 회색이고 깃발은 빨강 그대로이던 것(목록 줄은 끝내면 깃발이 흐림 · 34호) */
 .cal-more { font-size: 0.625rem; font-weight: 600; color: var(--ink-3); text-align: left; padding-left: 11px; height: calc(13px * var(--text-scale, 1)); line-height: calc(13px * var(--text-scale, 1)); }
 /* 기간 띠(크게 보기 · 넓은 화면) — 목록 색을 옅게 섞은 띠, 첫날은 점이 앞에 서고 마지막 날은 둥글게 닫힘 */
 .cal-lanes { gap: 1px; }
@@ -1145,7 +1174,12 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .day-close-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 999px; color: var(--done-ink); font-weight: 650; font-size: 0.9375rem; background: color-mix(in srgb, var(--done-soft) 70%, transparent); }
 .day-close-btn:active { transform: scale(.97); }
 /* 오늘 한 일 — 끝낸 시각 순서로 한 장 (세로 줄 하나로 이어진 하루) */
-.close-head { display: flex; align-items: center; gap: 10px; font-size: 1.125rem; font-weight: 750; margin: 2px 2px 8px; }
+.close-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 1.125rem; font-weight: 750; margin: 2px 2px 8px; }
+/* 날짜 줄 = 캘린더 머리와 같은 모양(왼쪽 날짜 · 오른쪽 ‹ ›) — 기록이 있는 앞뒤 날로 넘김 (11-14) */
+.close-date { min-width: 0; }
+.close-nav { flex: none; display: flex; gap: 4px; margin: -8px -8px -8px 0; }
+.close-nav .icon-btn:disabled { opacity: .28; }
+.close-nav .icon-btn:disabled:active { background: none; transform: none; }
 .close-head .day-mark { width: 22px; height: 22px; border-radius: 6px; }
 .done-log { position: relative; padding: 4px 0 4px; }
 .done-log-row { display: grid; grid-template-columns: 4.6rem 14px 1fr; align-items: baseline; gap: 8px; padding: 9px 2px; }
@@ -1186,8 +1220,12 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .detail-head .check { margin-top: 2px; }
 .detail-title { flex: 1; border: 0; background: none; padding: 0; resize: none; overflow: hidden; font-size: 1.3125rem; font-weight: 700; line-height: 1.35; letter-spacing: -.01em; }
 .detail-head.is-done .detail-title { color: var(--ink-2); }
-.occ-line { display: flex; align-items: center; gap: 6px; margin: -2px 0 12px 42px; font-size: 0.875rem; color: var(--ink-2); }
-.occ-line .text-btn { margin-left: auto; }
+.occ-line { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; margin: -2px 0 12px 42px; font-size: 0.875rem; color: var(--ink-2); }
+.occ-line .occ-date { white-space: nowrap; }
+/* 회차 단추(이번만 옮기기 · 건너뛰기)는 날짜 아래 줄에 알약 단추로 — 회색 글자만 오른쪽 끝에 떠 있어 단추인 줄 모르던 것 (11-14 · 옛 35호 '오른쪽에 붙고 모자라면 다음 줄') */
+.occ-acts { display: flex; flex-wrap: wrap; gap: 8px; flex-basis: 100%; max-width: 100%; margin: 8px 0 2px; }
+.occ-acts .text-btn { white-space: nowrap; padding: 7px 13px; border-radius: var(--r-pill); background: var(--surface); color: var(--ink); font-weight: 600; }
+.occ-acts .text-btn:active { background: var(--press); }
 .detail-block { margin: 14px 0; }
 .block-label { font-size: var(--fs-sub); font-weight: 700; color: var(--ink-2); padding: 0 4px 6px; }
 .subs-edit { background: var(--surface); border-radius: var(--r-card); padding: 4px 6px 4px 14px; }
@@ -1211,6 +1249,30 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .note:focus { box-shadow: inset 0 0 0 1.5px var(--accent); border-color: transparent; }
 .delete-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin: 18px 0 4px; padding: 14px; border-radius: 14px; color: var(--ink-2); font-weight: 650; font-size: 0.9375rem; }
 .delete-btn:active { background: var(--press); }
+/* '다른 날에 복사'(11-16) — 지우기와 같은 조용한 단추를 바로 위에 붙여 한 묶음 */
+.copy-box:not(:empty) + .delete-btn { margin-top: 0; }
+.copy-btn { margin-bottom: 0; }
+
+/* 다른 날에서 가져오기 (11-16 · screens/copy.js) */
+.day-foot { display: flex; justify-content: center; margin: 4px 0 6px; }
+.day-pull { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }   /* 일이 있는 날 맨 아래 = 조용한 회색(덜 쓰는 기능은 묻히지도 튀지도 않게) */
+.day-pull:active { background: var(--press); }
+.day-empty .day-pull { margin-top: 12px; color: var(--accent-ink); }   /* 빈 날 안내 상자 안 = 할 일을 채우는 길이라 포인트 색 글 */
+.day-empty .day-pull:active { background: var(--accent-soft); }
+.copy-into { margin: -4px 2px 16px; font-size: var(--fs-sub); color: var(--ink-2); }
+.copy-chips { margin: 0 0 14px; }
+.copy-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 16px; text-align: left; background: var(--surface); transition: background var(--fast); }
+.copy-row:active { background: var(--press); }
+.copy-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.copy-title { font-size: 1rem; overflow-wrap: anywhere; transition: color var(--fast); }
+.copy-row[aria-checked="false"] .copy-title { color: var(--ink-3t); }   /* 뺀 줄은 글자만 흐리게 */
+.copy-meta { display: flex; flex-wrap: wrap; gap: 0 8px; font-size: var(--fs-small); color: var(--ink-2); }
+.copy-same { color: var(--ink-3t); }
+.copy-note { margin: -4px 4px 12px; font-size: var(--fs-small); color: var(--ink-2); }
+/* 가져오기 단추는 창 아래에 붙어 있음 — 일이 많은 날에도 내리지 않고 누름 */
+/* 창 안 아래 여백은 이 칸이 가짐(창 몸통 아래 여백 0) — 아래 여백을 음수 바깥 여백으로 덮으면 '붙어 있기'가 몸통 안쪽 칸을 기준으로 20px 위로 밀어 마지막 줄을 덮었음 (11-16 잰 값) */
+.copy-sheet .sheet-body { padding-bottom: 0; }
+.copy-foot { position: sticky; bottom: 0; margin: 14px calc(-20px - var(--safe-r)) 0 calc(-20px - var(--safe-l)); padding: 12px calc(20px + var(--safe-r)) 20px calc(20px + var(--safe-l)); background: var(--bg); }
 
 /* 빠른 추가 */
 .qa-sheet .sheet-head { min-height: 32px; padding-bottom: 2px; }
@@ -1224,6 +1286,9 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .qa-flag:active { background: var(--press); }
 .qa-flag.is-on { color: var(--flag); box-shadow: inset 0 0 0 1.5px var(--flag); }
 .qa-flag.is-on .flag-ico { color: var(--flag); animation: flag-pop 320ms var(--ease); }
+/* 한 번 커진 높이를 지키는 칸(quickadd.js keepHeight) — 남는 높이는 칩과 맨 아래 줄 사이에(입력 칸 · '계속 추가' 둘 다 제자리) */
+.qa-wrap { display: flex; flex-direction: column; }
+.qa-wrap .qa-foot { margin-top: auto; padding-top: 10px; }
 .qa-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: 12px; padding: 6px 6px 6px 16px; box-shadow: inset 0 0 0 1px var(--line); }
 .qa-input { flex: 1; min-width: 0; border: 0; background: none; font-size: max(16px, 1.0938rem); min-height: 44px; padding: 0; }
 .qa-input::placeholder { color: var(--ink-3); }
@@ -1236,8 +1301,7 @@ html[data-text="lg"] .pick-chips, html[data-text="xl"] .pick-chips { flex-wrap: 
 .qa-chips { margin: 12px 0 0; padding: 2px 0; flex-wrap: wrap; overflow: visible; }   /* 모든 글자 크기에서 줄바꿈 — 옆으로 밀어야 보이던 '반복 · 목록' 칩을 60대가 못 찾던 것 (새 눈 3호 5번) */
 @media (min-width: 768px) and (min-height: 560px) { .qa-chips { flex-wrap: wrap; overflow: visible; -webkit-mask-image: none; mask-image: none; } } /* 넓은 화면은 칩 줄바꿈 (마우스로 옆 넘기기 불편) */
 html[data-text="lg"] .qa-chips, html[data-text="xl"] .qa-chips { flex-wrap: wrap; overflow: visible; -webkit-mask-image: none; mask-image: none; } /* 글자 크게 이상은 휴대폰도 줄바꿈 — 뒤쪽 칩이 화면 밖에 숨지 않게 (2호 13번) */
-@media (hover: hover) { .side-add:hover { background: var(--accent); } }
-.occ-line .text-btn { color: var(--ink-2); }
+@media (hover: hover) { .side-add:hover { background: var(--accent-soft); } }   /* 옅은 주 색 — 진한 주 색 바탕이면 같은 주 색 글자가 묻혀 안 보이던 것 (구역 5) */
 .screen-settings .seg-wrap { margin: 0 0 4px; }
 
 /* 주 색 고르기 — 위: 작은 예시(지금 고른 색으로 바로 그려짐) · 아래: 견본 4개(그 화면 색에서 실제로 보일 값) */
@@ -1252,7 +1316,9 @@ html[data-text="lg"] .qa-chips, html[data-text="xl"] .qa-chips { flex-wrap: wrap
 .accent-sample .task { background: none; padding: 7px 10px 7px 12px; pointer-events: none; }
 .accent-sample .task + .task { border-top: 1px solid var(--line); }
 .accent-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-.accent-swatch { min-width: 0; text-align: center; overflow-wrap: anywhere; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0 4px; border-radius: 12px; color: var(--ink-2); font-size: var(--fs-small); font-weight: 500; }
+html[data-text="xl"] .accent-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }   /* 가장 큰 글자는 두 칸씩 — 'Tangerin/e'처럼 낱말 중간이 끊기던 것 (구역 5) */
+@media (max-width: 374px) { html[data-text="lg"] .accent-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }   /* 좁은 폰 + 큰 글자도 (구역 5 재확인 · 첫 실행 세 줄과 같은 문턱) */
+.accent-swatch { min-width: 0; text-align: center; overflow-wrap: break-word; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0 4px; border-radius: 12px; color: var(--ink-2); font-size: var(--fs-small); font-weight: 500; }
 .accent-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--sw); box-shadow: 0 0 0 2px var(--surface), 0 0 0 2px transparent; transition: box-shadow var(--mid) var(--ease), transform var(--fast) var(--ease); }
 .accent-swatch:active .accent-dot { transform: scale(.92); }
 .accent-swatch.is-on { color: var(--ink); font-weight: 650; }
@@ -1265,6 +1331,9 @@ html[data-text="lg"] .qa-chips, html[data-text="xl"] .qa-chips { flex-wrap: wrap
 .day-rel { margin-right: 8px; color: var(--ink-2); }   /* 어제 · 내일은 보조 색 — 지난 날에 경고색을 쓰지 않음 (감성 검토 10-31) */
 .day-rel.is-today { color: var(--accent-ink); }
 .day-count { color: var(--ink-2) !important; font-weight: 600; }   /* '3개 했어요'는 귤색 강조 없이 조용히 (플래너 감성 조수) */
+/* 누르면 그날 '한 일' 창 — 오늘 화면 머리의 같은 글(.progress-row.is-tap)과 같은 모양 · 같은 동작 (11-14) */
+.day-count.is-tap { display: inline-flex; align-items: center; gap: 2px; margin: -6px -8px -6px 0; padding: 6px 8px; border-radius: 8px; }
+.day-count.is-tap:active { background: var(--press); }
 .fold-sub { margin-left: 6px; font-size: 0.75rem; font-weight: 600; color: var(--accent-ink); }
 
 /* 안으로 들어가는 화면(목록 하나 · 설정 묶음)은 옆에서, 나올 때는 반대쪽에서 — 어디로 들어왔는지 손에 남게. 탭 이동은 움직임 없음 */
@@ -1326,6 +1395,11 @@ html[data-text="lg"] .qa-chips, html[data-text="xl"] .qa-chips { flex-wrap: wrap
 /* 가장 큰 글자(폰 큰 글씨면 첫 실행부터 이 값): 세 칸 한 줄은 '그라파이/트'로 끊김 → 위아래 세 줄(견본 · 이름 가로) (18호 재확인) */
 html[data-text="xl"] .ob-choices { grid-auto-flow: row; grid-template-columns: 1fr; }
 html[data-text="xl"] .ob-choice { flex-direction: row; justify-content: flex-start; gap: 14px; min-height: 64px; padding: 12px 16px; }
+/* 좁은 폰(375 미만) + 큰 글자도 같은 세 줄 — 세 칸 한 줄이면 '그라파이/트'로 끊김 (구역 5) */
+@media (max-width: 374px) {
+  html[data-text="lg"] .ob-choices { grid-auto-flow: row; grid-template-columns: 1fr; }
+  html[data-text="lg"] .ob-choice { flex-direction: row; justify-content: flex-start; gap: 14px; min-height: 64px; padding: 12px 16px; }
+}
 .ob-choice.is-on .ob-choice-label { color: var(--accent-ink); }
 .ob-ga { font-weight: 750; line-height: 1; color: var(--ink); }
 .ob-ga.s1 { font-size: 15px; } .ob-ga.s2 { font-size: 19px; } .ob-ga.s3 { font-size: 24px; } .ob-ga.s4 { font-size: 30px; } /* 고르는 칸의 '가'는 설정과 무관하게 고정 크기 */
@@ -1357,6 +1431,7 @@ html[data-text="xl"] .ob-choice { flex-direction: row; justify-content: flex-sta
 .mark-opt.is-on .mark-radio { background: var(--accent); box-shadow: none; }
 .mark-sample { background: var(--bg); border-radius: 10px; flex: none; margin-left: auto;   /* 견본은 실제 달력처럼 바탕(--bg) 위에 — 고른 날 상자 면이 보이게 */ display: grid; grid-template-columns: repeat(4, calc(38px * max(1, var(--text-scale, 1)))); }
 .mark-sample .cal-cell { width: 100%; pointer-events: none; height: calc(50px * var(--text-scale, 1)); justify-content: center; padding-top: 0; }
+.mark-sample .cal-cell.is-sel:not(.is-today) { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); border-radius: 10px; }   /* 견본엔 점 겹이 없어 폰의 '고른 날' 상자를 칸에 직접 — 좁은 폭에서 '고른 날' 견본이 상자 없이 보이던 것 (구역 5) */
 .mark-sample .cal-dots { display: flex; }   /* 넓은 화면(1100+) 달력 규칙이 견본에 걸려 표식이 숨던 것 */
 .screen-cal .page-head .title { font-size: min(var(--fs-title), 6vw); }   /* 좁은 폰 · 큰 글자 · 영어 달 이름이 낱말 중간에서 끊기지 않게 */
 
@@ -1385,7 +1460,7 @@ html[data-text="xl"] .ob-choice { flex-direction: row; justify-content: flex-sta
 <div id="toast" class="toast-host" aria-live="polite"></div>
 
 <!-- 불러오는 순서 = 층 순서. 아래층(core · domain)은 위층(screens)을 모른다. 설계 = 기획/기획서.md 5절 -->
-<script>window.APP_VERSION = "0.1.0 \u00b7 2c467f6f";</script>
+<script>window.APP_VERSION = "0.1.0 \u00b7 a3f29e5d";</script>
 <script>
 /* 날짜 · id · 작은 도구. 날짜는 늘 'YYYY-MM-DD' 글자(기기 시간대 기준)로 다룬다. */
 window.App = window.App || {};
@@ -1473,10 +1548,19 @@ App.lang.ko = {
   'today.emptyTitle': '오늘은 비어 있어요', 'today.emptyText': '+를 눌러 할 일을 적어 보세요', 'today.nextUp': '다음 할 일 · {what}', 'today.seeCal': '캘린더에서 보기',
   'today.allDoneTitle': '오늘 할 일을 다 했어요', 'today.hiddenTitle': '끝낸 일은 숨겨 두었어요', 'today.allDoneText': '끝낸 일은 캘린더에 남아 있어요',
   'today.moveAll': '다 오늘로 옮기기', 'today.movedAll': '{n}개를 오늘로 옮겼어요',
-  'install.title': '홈 화면에 추가하면 앱처럼 써요', 'install.text': 'Safari 공유 단추 → \'홈 화면에 추가\'. 사파리 탭에서는 한동안 안 열면 할 일이 지워질 수 있고, 적은 할 일이 홈 화면 앱으로 옮겨지지도 않아요. 추가한 다음에 적어 주세요.',
+  /* 11-14: 한 덩어리 글을 제목 · 하는 법 · 까닭 세 칸으로(내용은 그대로) */
+  'install.title': '홈 화면에 추가하면 앱처럼 써요', 'install.step': '사파리 공유 단추 → \'홈 화면에 추가\'',
+  'install.why': '사파리 탭에서 적은 할 일은 홈 화면 앱으로 옮겨지지 않고, 한동안 안 열면 지워질 수 있어요. 추가한 다음에 적어 주세요.',
+  /* 복사 (11-16 · screens/copy.js) — '복사' 한 낱말로 두 길(다른 날에서 가져오기 · 할 일 하나 다른 날에 복사) */
+  'copy.pull': '다른 날에서 가져오기', 'copy.pullTitle': '다른 날에서 가져오기', 'copy.into': '{date}에 넣어요', 'copy.from': '가져올 날',
+  'copy.weekAgo': '1주 전', 'copy.dayAgo': '하루 전', 'copy.empty': '그날은 가져올 일이 없어요', 'copy.same': '이미 있어요',
+  'copy.asNew': '끝낸 표시 없이 새 일로 들어가요.', 'copy.repeatNote': '반복하는 일 {n}개는 반복대로 떠서 가져오지 않아요.',
+  'copy.pullN': '{n}개 가져오기', 'copy.pullNone': '가져올 일을 골라 주세요', 'copy.pulled': '{n}개를 가져왔어요',
+  'copy.one': '다른 날에 복사', 'copy.oneTitle': '복사할 날', 'copy.oneDone': '{date}로 복사했어요', 'copy.see': '그날 보기',
+  'done.title': '한 일', 'done.prev': '기록이 있는 앞 날', 'done.next': '기록이 있는 다음 날',
 
   'sec.overdue': '지난 일', 'sec.overdueN': '지난 일 {n}개', 'row.subCount': '세부 {done}/{total}', 'qa.from': '{date}부터', 'sec.today': '오늘', 'sec.anytime': '언제든', 'sec.dueBy': '언제까지 할 일', 'sec.upcoming': '다가오는 일', 'sec.repeat': '반복', 'sec.todo': '할 일', 'cal.big': '캘린더 크게 보기', 'photo.view': '사진 크게 보기', 'cal.small': '캘린더 작게 보고 목록 보기', 'sec.anytimeMore': '{n}개 더 보기', 'sec.anytimeLess': '접기', 'list.historyHide': '지난 기록 접기', 'list.historyMore': '{n}개 더 보기',
-  'order.top': '맨 위로', 'order.up': '위로', 'order.down': '아래로', 'order.hint': '할 일을 꾹 누르면 메뉴가 열리고, 누른 채 위아래로 끌면 순서를 바꿀 수 있어요',
+  'order.top': '맨 위로', 'order.up': '위로', 'order.down': '아래로', 'order.hint': '꾹 누르면 메뉴, 누른 채 끌면 순서가 바뀌어요',   /* 두 줄이던 안내를 한 줄로 (11-14) */
   'menu.today': '오늘로 옮기기', 'menu.tomorrow': '내일로 미루기', 'menu.nextWeek': '다음 주 월요일로', 'menu.pick': '날짜 고르기', 'menu.skip': '이번만 건너뛰기', 'menu.open': '자세히 보기',
   'menu.movedTo': '{date}로 옮겼어요', 'menu.unscheduled': '날짜 없이 뒀어요', 'detail.earlier': '하루 앞으로', 'detail.later': '하루 뒤로', 'sec.history': '지난 기록',
   'done.show': '끝낸 일 {n}개 보기', 'done.hide': '끝낸 일 숨기기',
@@ -1511,15 +1595,15 @@ App.lang.ko = {
   'notify.turnOn': '켜기', 'notify.exactOff': '정확한 시각 알림이 꺼져 있어요', 'notify.openSettings': '설정 열기',
   'notify.battery': '알림이 늦게 오면 · 배터리 설정', 'notify.needsInstallToast': '알림은 홈 화면에 추가한 앱에서 받을 수 있어요',
   'notify.deniedToast': '알림이 꺼져 있어서 울리지 않아요', 'notify.deniedToastWeb': '알림이 꺼져 있어서 울리지 않아요. 브라우저 설정에서 이 사이트 알림을 허용해 주세요',
-  'notify.exactTitle': '정한 시각에 바로 알려 드릴까요?',
+  'notify.exactTitle': '정한 시각에 바로 알릴까요?',   /* '알려 드릴까요'만 높임이 달랐음 — 앱 전체 '알려요' 말투로 (11-14) */
   'notify.exactText': '설정에서 \'알람 및 리마인더\'를 허용하면 정한 시각에 바로 알려요. 허용하지 않으면 몇 분 늦을 수 있어요.',
 
   'list.none': '목록 없음', 'list.new': '새 목록', 'list.namePh': '예: 집, 회사, 운동', 'list.rename': '이름 바꾸기', 'list.color': '색',
-  'list.deleteQ': '\'{name}\' 목록을 지울까요?', 'list.deleteText': '목록만 지워지고, 안에 있던 할 일은 그대로 남아요. 30일 안에는 설정의 \'최근 지운 항목\'에서 목록을 되살릴 수 있어요.',
+  'list.deleteQ': '\'{name}\' 목록을 지울까요?', 'list.deleteText': '목록만 지워지고, 안에 있던 할 일은 그대로 남아요. 30일 안에는 목록 화면 맨 아래 \'최근 지운 항목\'에서 되살릴 수 있어요.',
   'list.delete': '목록 지우기', 'list.deleted': '목록을 지웠어요', 'list.more': '목록 설정',
   'list.emptyTitle': '아직 할 일이 없어요', 'list.emptyText': '+를 누르면 이 목록에 들어가요', 'list.history': '지난 기록 {n}개 보기',
   'lists.title': '내 목록', 'lists.left': '할 일 {n}개', 'lists.suggest': '집,회사,운동', 'lists.suggestLabel': '예시 목록', 'lists.made': '\'{name}\' 목록을 만들었어요', 'lists.suggestHide': '예시 닫기', 'lists.suggestHidden': '예시를 닫았어요',
-  'lists.hint': '누르면 그 이름으로 바로 만들어져요. 목록은 없어도 괜찮아요.',
+  'lists.hint': '누르면 그 이름으로 바로 만들어져요. 목록 없이 써도 돼요.',
   'color.orange': '주황', 'color.yellow': '노랑', 'color.green': '초록', 'color.teal': '청록', 'color.blue': '파랑',
   'color.violet': '보라', 'color.pink': '분홍', 'color.gray': '회색',
 
@@ -1559,14 +1643,15 @@ App.lang.ko = {
   'ob.themeLabel': '화면 색', 'ob.later': '설정에서 언제든 바꿀 수 있어요',
   'set.textSize': '글자 크기', 'set.trial': '시험판', 'set.trialOn': '예시 보는 중', 'size.reset': '기본으로', 'size.default': '{p} 기본', 'set.vivid': '선명도',
   'news.title': '새 버전으로 바뀌었어요',
-  'news.lines': '여행처럼 며칠 걸친 일은 날짜 두 개를 눌러 기간으로 넣을 수 있어요|알림은 날짜와 시각을 골라 정해요. 알림이 있는 일엔 종 표시가 붙어요|적다가 창을 닫아도 다시 +를 누르면 적던 글이 그대로 있어요',   /* 3줄 · 결과 위주(손짓 설명은 빼고 — 새 눈 점검원 2호 12번) */
+  /* 3줄 · 결과 위주(손짓 설명은 빼고 — 새 눈 점검원 2호 12번). 11-15 판 — 옛 판(11-03): 여행처럼 며칠 걸친 일은 날짜 두 개를 눌러 기간으로 … */
+  'news.lines': '캘린더에서 날을 고르고 맨 아래 \'다른 날에서 가져오기\'를 누르면 지난 날 할 일을 골라 복사해 올 수 있어요|\'n개 했어요\'를 누르면 그날 한 일이 보이고, 지난 날로 넘겨 볼 수 있어요|설정은 \'화면\'과 \'일반\'으로 나눴고, \'최근 지운 항목\'은 목록 화면 맨 아래로 옮겼어요',
   'news.keep': '할 일 기록은 그대로예요.',
   'list.mark': '표시', 'list.markDot': '색 점', 'list.markType': '이모지 직접 넣기', 'list.markPhoto': '사진 넣기', 'list.myPhoto': '내 사진',
   'list.myPhotoDelQ': '이 사진을 내 사진에서 뺄까요?', 'list.myPhotoDelText': '이미 이 사진을 쓰는 목록은 그대로예요.', 'list.myPhotoDel': '빼기', 'list.myPhotoDeleted': '내 사진에서 뺐어요',
   'photo.title': '사진 맞추기', 'photo.zoom': '크기', 'photo.hint': '끌어서 옮기고, 두 손가락이나 막대로 키워요.', 'photo.bad': '이 사진은 불러올 수 없어요',
-  'set.accent': '주 색', 'set.accentSame': '{names} 목록도 같은 색이에요. 목록 색을 바꾸면 체크와 덜 헷갈려요', 'list.accentSame': '\'{color}\' 색은 지금 체크 색과 같아서 끝낸 표시와 헷갈릴 수 있어요', 'accent.tangerine': '귤색', 'accent.blue': '파랑', 'accent.green': '초록', 'accent.violet': '보라', 'accent.sample1': '장보기', 'accent.sample2': '운동 30분',
-  'set.look': '화면과 쓰는 방식', 'set.lookSum': '{size} · {theme} · {accent}', 'set.records': '백업',
-  'notify.short.granted': '켜짐', 'notify.short.default': '꺼짐', 'notify.short.denied': '꺼짐', 'notify.short.needs-install': '홈 화면에 추가하면 켤 수 있어요', 'notify.short.unsupported': '지원 안 함',
+  'set.accent': '포인트 색',   /* 옛 '주 색' → 흔히 쓰는 말로 (사용자 11-15 '포인트 색으로 바꿔도 되고') */'set.accentSame': '{names} 목록도 같은 색이에요. 목록 색을 바꾸면 체크와 덜 헷갈려요', 'list.accentSame': '\'{color}\' 색은 지금 체크 색과 같아서 끝낸 표시와 헷갈릴 수 있어요', 'accent.tangerine': '귤색', 'accent.blue': '파랑', 'accent.green': '초록', 'accent.violet': '보라', 'accent.sample1': '장보기', 'accent.sample2': '운동 30분',
+  'set.look': '화면', 'set.general': '일반', 'set.lookSum': '{size} · {theme} · {accent}', 'set.records': '백업',
+  'notify.short.granted': '켜짐', 'notify.short.default': '꺼짐', 'notify.short.denied': '꺼짐', 'notify.short.needs-install': '홈 화면 추가 필요', 'notify.short.unsupported': '지원 안 함',
   'backup.lastShort': '{date}에 내보냄',
   'span.progress': '{n}일째 / {total}일', 'cal.span': '이어지는 일', 'span.mode': '이 기간에', 'span.once': '한 번 하기', 'span.daily': '매일 하기',
   'span.onceNote': '기간 안에 한 번 끝내면 돼요.', 'span.dailyNote': '기간 동안 날마다 따로 체크해요.',
@@ -1582,8 +1667,8 @@ App.lang.ko = {
   'trash.empty': '최근 지운 항목이 없어요', 'trash.left': '{n}일 뒤 완전히 지워져요', 'trash.leftToday': '오늘 완전히 지워져요', 'trash.restore': '되살리기', 'trash.restored': '되살렸어요',
   'detail.subDeleted': '세부 할 일을 지웠어요', 'detail.subsPasted': '세부 할 일 {n}개를 넣었어요',
   'detail.deleteRepeatQ': '반복하는 할 일이에요', 'detail.endRepeat': '반복 그만하기', 'detail.endRepeatSub': '오늘까지만 뜨고, 지금까지 한 기록은 캘린더에 남아요',
-  'detail.deleteAll': '기록까지 모두 지우기', 'detail.deleteAllSub': '캘린더에서도 사라져요. 30일 안에는 설정에서 되살릴 수 있어요',
-  'rep.ended': '반복을 그만했어요', 'rep.endedOn': '{date}까지 반복', 'rep.untilBeforeFirst': '그날까지는 돌아오는 날이 없어요. 처음 돌아오는 날은 {date}예요', 'qa.untilDropped': '끝나는 날까지 반복할 날이 없어서 끝나는 날은 빼고 넣었어요', 'qa.pastedNextDay': '이미 지난 시각은 내일로 넣었어요', 'rep.yearlyOn': '매년 {date}', 'rep.everyNYearsOn': '{n}년마다 {date}', 'rep.unit.year': '년',
+  'detail.deleteAll': '기록까지 모두 지우기', 'detail.deleteAllSub': '캘린더에서도 사라져요. 30일 안에는 목록 화면 맨 아래 \'최근 지운 항목\'에서 되살릴 수 있어요',
+  'rep.ended': '반복을 그만했어요', 'rep.endedOn': '{date}까지 반복', 'rep.until': '반복 · {date}까지', 'rep.untilBeforeFirst': '그날까지는 돌아오는 날이 없어요. 처음 돌아오는 날은 {date}예요', 'qa.untilDropped': '끝나는 날까지 반복할 날이 없어서 끝나는 날은 빼고 넣었어요', 'qa.pastedNextDay': '이미 지난 시각은 내일로 넣었어요', 'rep.yearlyOn': '매년 {date}', 'rep.everyNYearsOn': '{n}년마다 {date}', 'rep.unit.year': '년',
   'remind.morning': '그날 아침 9시', 'remind.dayBeforeMorning': '전날 아침 9시',
   'notify.whileOpen': '아이폰 · 웹에서는 앱을 열어 둔 동안 알려요',
   'notif.today': '오늘 할 일이에요', 'notif.dayBefore': '내일 할 일이에요', 'notif.dueToday': '오늘까지 할 일이에요', 'notif.dueTomorrow': '내일까지 할 일이에요',
@@ -1655,11 +1740,18 @@ App.lang = App.lang || {};
     'today.emptyTitle': 'Nothing for today', 'today.emptyText': 'Tap + to add a task', 'today.nextUp': 'Next up · {what}', 'today.seeCal': 'See in calendar',
     'today.allDoneTitle': 'All done for today', 'today.allDoneText': 'Completed tasks stay in your calendar',
     'today.moveAll': 'Move all to today', 'today.movedAll': { one: 'Moved 1 task to today', other: 'Moved {n} tasks to today' },
-    'install.title': 'Add to Home Screen to use this like an app', 'install.text': 'In Safari, tap Share → "Add to Home Screen". In a Safari tab, tasks can be cleared if you don\'t open it for a while, and they don\'t move to the Home Screen app, so add it first.',
+    'install.title': 'Add to Home Screen to use this like an app', 'install.step': 'In Safari, tap Share → "Add to Home Screen"',
+    'install.why': 'Tasks added in a Safari tab don\'t move to the Home Screen app, and can be cleared if you don\'t open it for a while. Add it first.',
+    'copy.pull': 'Copy from another day', 'copy.pullTitle': 'Copy from another day', 'copy.into': 'Into {date}', 'copy.from': 'Copy from',
+    'copy.weekAgo': '1 week before', 'copy.dayAgo': 'Day before', 'copy.empty': 'Nothing to copy from that day', 'copy.same': 'Already there',
+    'copy.asNew': 'They come in as new, not done.', 'copy.repeatNote': { one: '1 repeating task isn\'t copied. It shows up on its own schedule.', other: '{n} repeating tasks aren\'t copied. They show up on their own schedule.' },
+    'copy.pullN': { one: 'Copy 1 task', other: 'Copy {n} tasks' }, 'copy.pullNone': 'Choose tasks to copy', 'copy.pulled': { one: 'Copied 1 task', other: 'Copied {n} tasks' },
+    'copy.one': 'Copy to another day', 'copy.oneTitle': 'Copy to', 'copy.oneDone': 'Copied to {date}', 'copy.see': 'Show that day',
+    'done.title': 'Done', 'done.prev': 'Earlier day with records', 'done.next': 'Later day with records',
 
     'sec.overdue': 'Earlier tasks', 'sec.overdueN': { one: '1 earlier task', other: '{n} earlier tasks' },
     'sec.today': 'Today', 'sec.anytime': 'Unscheduled', 'sec.dueBy': 'With a deadline', 'sec.upcoming': 'Upcoming', 'sec.repeat': 'Recurring', 'sec.todo': 'To-dos', 'cal.big': 'Expand calendar', 'photo.view': 'View photo', 'cal.small': 'Show the day list', 'rep.untilBeforeFirst': 'It doesn’t come up before then. The first one is {date}', 'qa.untilDropped': 'It doesn’t come up before the end date, so it was added without one', 'qa.pastedNextDay': 'times that had passed went on tomorrow', 'sec.anytimeMore': 'Show {n} more', 'sec.anytimeLess': 'Show less', 'list.historyHide': 'Hide history', 'list.historyMore': 'Show {n} more',
-    'order.top': 'Move to top', 'order.up': 'Up', 'order.down': 'Down', 'order.hint': 'Press and hold a task for a menu, or hold and drag to move it',
+    'order.top': 'Move to top', 'order.up': 'Up', 'order.down': 'Down', 'order.hint': 'Hold a task for a menu, or hold and drag to reorder',
     'menu.today': 'Move to today', 'menu.tomorrow': 'Move to tomorrow', 'menu.nextWeek': 'Move to next Monday', 'menu.pick': 'Pick a date', 'menu.skip': 'Skip this time', 'menu.open': 'Open details',
     'menu.movedTo': 'Moved to {date}', 'menu.unscheduled': 'Now has no date', 'detail.earlier': 'One day earlier', 'detail.later': 'One day later', 'sec.history': 'Completed',
     'done.show': { one: 'Show 1 completed task', other: 'Show {n} completed tasks' }, 'done.hide': 'Hide completed tasks',
@@ -1701,7 +1793,7 @@ App.lang = App.lang || {};
     'notify.exactText': 'Allow "Alarms & reminders" in settings to get them at the exact time. Without it, they may be a few minutes late.',
 
     'list.none': 'No list', 'list.new': 'New list', 'list.namePh': 'e.g. Home, Work, Workout', 'list.rename': 'Rename', 'list.color': 'Color',
-    'list.deleteQ': 'Delete the list "{name}"?', 'list.deleteText': 'Only the list is deleted. Its tasks stay. You can restore the list from Recently deleted in Settings for 30 days.',
+    'list.deleteQ': 'Delete the list "{name}"?', 'list.deleteText': 'Only the list is deleted. Its tasks stay. You can restore the list from Recently deleted at the bottom of Lists for 30 days.',
     'list.delete': 'Delete list', 'list.deleted': 'List deleted', 'list.more': 'List options',
     'list.emptyTitle': 'No tasks yet', 'list.emptyText': 'Tap + to add one to this list',
     'list.history': { one: 'Show 1 completed task', other: 'Show {n} completed tasks' },
@@ -1710,7 +1802,7 @@ App.lang = App.lang || {};
     'color.orange': 'Orange', 'color.yellow': 'Yellow', 'color.green': 'Green', 'color.teal': 'Teal', 'color.blue': 'Blue',
     'color.violet': 'Purple', 'color.pink': 'Pink', 'color.gray': 'Gray',
 
-    'cal.prev': 'Previous month', 'cal.next': 'Next month', 'cal.cellStat': '{done} of {total} done', 'cal.cellCount': '{n} tasks',
+    'cal.prev': 'Previous month', 'cal.next': 'Next month', 'cal.cellStat': '{done} of {total} done', 'cal.cellCount': { one: '{n} task', other: '{n} tasks' },
     'hol.newYear': 'New Year\'s Day', 'hol.seolEve': 'Seollal holiday', 'hol.seol': 'Seollal', 'hol.seolAfter': 'Seollal holiday', 'hol.march1': 'Independence Movement Day', 'hol.labor': 'Labor Day',
     'hol.children': 'Children\'s Day', 'hol.buddha': 'Buddha\'s Birthday', 'hol.memorial': 'Memorial Day', 'hol.constitution': 'Constitution Day', 'hol.liberation': 'Liberation Day',
     'hol.chuseokEve': 'Chuseok holiday', 'hol.chuseok': 'Chuseok', 'hol.chuseokAfter': 'Chuseok holiday', 'hol.foundation': 'National Foundation Day', 'hol.hangul': 'Hangeul Day',
@@ -1742,26 +1834,26 @@ App.lang = App.lang || {};
 
     'ob.label': 'Setup', 'ob.step': 'Step {n} of {total}', 'ob.skip': 'Skip', 'ob.next': 'Next', 'ob.start': 'Get started',
     'ob.hello': 'Set your text size', 'ob.sizeText': 'Drag the slider until the text is comfortable to read.', 'ob.sizeSample': 'Your tasks will look this size.',
-    'ob.themeTitle': 'Pick a look', 'ob.themeText': 'It changes as soon as you tap.', 'ob.prev': 'Back',
-    'ob.themeLabel': 'Appearance', 'ob.later': 'You can change this anytime in Settings',
-    'set.textSize': 'Text size', 'set.trial': 'Trial version', 'set.trialOn': 'Viewing a sample', 'size.reset': 'Reset', 'size.default': '{p} default', 'set.vivid': 'Intensity',
+    'ob.themeTitle': 'Pick a theme', 'ob.themeText': 'It changes as soon as you tap.', 'ob.prev': 'Back',
+    'ob.themeLabel': 'Theme', 'ob.later': 'You can change this anytime in Settings',
+    'set.textSize': 'Text size', 'set.trial': 'Trial version', 'set.trialOn': 'Viewing an example', 'size.reset': 'Reset', 'size.default': '{p} default', 'set.vivid': 'Intensity',
     'news.title': 'What’s new',
-    'news.lines': 'For trips and other multi-day tasks, tap two dates to make a range|Pick a date and time for reminders. Tasks with a reminder show a bell|If you close the add sheet while typing, your text is still there next time you tap +',
+    'news.lines': 'Pick a day in Calendar and tap "Copy from another day" at the bottom to copy tasks from an earlier day|Tap the done count to see what you did that day, and page back through earlier days|Settings are split into Display and General, and Recently deleted is at the bottom of Lists',
     'news.keep': 'Your tasks are all still here.',
     'qa.more': 'Add another', 'qa.keep': 'Keep adding',
     'list.mark': 'Icon', 'list.markDot': 'Color dot', 'list.markType': 'Type an emoji', 'list.markPhoto': 'Add a photo', 'list.myPhoto': 'My photo',
     'list.myPhotoDelQ': 'Remove this from your photos?', 'list.myPhotoDelText': 'Lists already using it keep it.', 'list.myPhotoDel': 'Remove', 'list.myPhotoDeleted': 'Removed from your photos',
     'photo.title': 'Fit your photo', 'photo.zoom': 'Size', 'photo.hint': 'Drag to move. Pinch or use the slider to zoom.', 'photo.bad': 'This photo can’t be opened',
     'set.accent': 'Accent color', 'set.accentSame': 'Same color as your list: {names}. Changing the list color keeps it apart from checks', 'list.accentSame': '{color} is your check color right now, so it can look like a done mark', 'accent.tangerine': 'Tangerine', 'accent.blue': 'Blue', 'accent.green': 'Green', 'accent.violet': 'Purple', 'accent.sample1': 'Groceries', 'accent.sample2': '30-minute workout',
-    'set.look': 'Display & behavior', 'set.lookSum': '{size} · {theme} · {accent}', 'set.records': 'Backup',
-    'notify.short.granted': 'On', 'notify.short.default': 'Off', 'notify.short.denied': 'Off', 'notify.short.needs-install': 'Add to Home Screen to turn on', 'notify.short.unsupported': 'Not supported',
+    'set.look': 'Display', 'set.general': 'General','set.lookSum': '{size} · {theme} · {accent}', 'set.records': 'Backup',
+    'notify.short.granted': 'On', 'notify.short.default': 'Off', 'notify.short.denied': 'Off', 'notify.short.needs-install': 'Needs Home Screen', 'notify.short.unsupported': 'Not supported',
     'backup.lastShort': 'Exported {date}',
     'span.progress': 'Day {n} of {total}', 'cal.span': 'Ongoing', 'span.mode': 'In this period', 'span.once': 'Do once', 'span.daily': 'Do every day',
     'span.onceNote': 'Finish it once before the end date.', 'span.dailyNote': 'Check it off each day of the period.',
     'menu.todayShort': 'Today', 'menu.tomorrowShort': 'Tomorrow', 'menu.nextWeekShort': 'Next Mon', 'menu.pickShort': 'Pick a date', 'rep.off': 'Repeat turned off',
     'reset.row': 'Start over', 'reset.sub': 'Like a fresh install',
     'reset.title': 'Start over?', 'reset.text': 'The app starts again from the first screen. Your current tasks are saved separately, and you can get them back anytime from Settings › Backup › Go back to saved tasks.',
-    'reset.ok': 'Erase and start over', 'sample.moderate': 'A moderately busy month', 'sample.moderateSub': 'A few tasks a day · a few routines', 'sample.busy': 'A very busy month', 'sample.busySub': 'Packed days · many routines', 'sample.moderateQ': 'Switch to the moderate example?', 'sample.busyQ': 'Switch to the busy example?', 'sample.text': 'Your current tasks are saved separately. You can get them back anytime from Settings › Backup › Go back to saved tasks.', 'sample.ok': 'Switch', 'sample.done': 'Switched to the example', 'reset.done': 'Started over',
+    'reset.ok': 'Erase and start over', 'sample.moderate': 'A moderately busy month', 'sample.moderateSub': 'A few tasks a day · a few routines · in Korean', 'sample.busy': 'A very busy month', 'sample.busySub': 'Packed days · many routines · in Korean', 'sample.moderateQ': 'Switch to the moderate example?', 'sample.busyQ': 'Switch to the busy example?', 'sample.text': 'Your current tasks are saved separately. You can get them back anytime from Settings › Backup › Go back to saved tasks.', 'sample.ok': 'Switch', 'sample.done': 'Switched to the example', 'reset.done': 'Started over',
 
     'nav.menu': 'Menu', 'sec.dueLateN': { one: '1 past due', other: '{n} past due' },
     'search.title': 'Search', 'search.ph': 'Search tasks, notes, subtasks', 'search.none': 'No matching tasks',
@@ -1769,8 +1861,8 @@ App.lang = App.lang || {};
     'trash.empty': 'Nothing deleted recently', 'trash.left': { one: 'Erased in 1 day', other: 'Erased in {n} days' }, 'trash.leftToday': 'Erased today','trash.restore': 'Restore', 'trash.restored': 'Restored',
     'detail.subDeleted': 'Subtask deleted', 'detail.subsPasted': { one: 'Added 1 subtask', other: 'Added {n} subtasks' },
     'detail.deleteRepeatQ': 'This task repeats', 'detail.endRepeat': 'End repeat', 'detail.endRepeatSub': 'It stops after today. What you\'ve done stays in your calendar.',
-    'detail.deleteAll': 'Delete it and its history', 'detail.deleteAllSub': 'It disappears from your calendar. You can restore it in Settings for 30 days.',
-    'rep.ended': 'Repeat ended', 'rep.endedOn': 'Ended {date}', 'rep.yearlyOn': 'Every year on {date}', 'rep.everyNYearsOn': 'Every {n} years on {date}',
+    'detail.deleteAll': 'Delete it and its history', 'detail.deleteAllSub': 'It disappears from your calendar. You can restore it from Recently deleted at the bottom of Lists for 30 days.',
+    'rep.ended': 'Repeat ended', 'rep.endedOn': 'Ended {date}', 'rep.until': 'Repeats until {date}', 'rep.yearlyOn': 'Every year on {date}', 'rep.everyNYearsOn': 'Every {n} years on {date}',
     'rep.unit.year': { one: 'year', other: 'years' },
     'remind.morning': 'That day at 9 AM', 'remind.dayBeforeMorning': 'Day before at 9 AM',
     'notify.whileOpen': 'On iPhone and in the browser, reminders appear while the app is open',
@@ -1786,7 +1878,7 @@ App.lang = App.lang || {};
     'remind.past': 'That time has passed', 'remind.pastShort': 'Passed', 'remind.dup': 'Already added', 'remind.dateRow': 'Date', 'remind.timeRow': 'Time', 'remind.absAt': '{date}, {time}',
     'remind.repeatNote': 'Repeating tasks ring at the same point before each one', 'remind.added': 'Reminder set', 'remind.removed': 'Reminder deleted', 'remind.repeatBase': 'Based on the next one, {date}',
     'remind.taskPast': 'This task\'s date has passed. Move the date first.', 'remind.moved': 'Reminders moved too · {what}', 'remind.atTimeToggle': 'Remind me at this time', 'remind.timeChip': 'Change time',
-    'notif.at': 'Due at {time}', 'notif.tomorrow': 'Due tomorrow', 'notif.on': 'Due on {date}', 'notif.dueOn': 'Due by {date}',
+    'notif.at': 'Today at {time}', 'notif.tomorrow': 'Scheduled for tomorrow', 'notif.on': 'Scheduled for {date}', 'notif.dueOn': 'Due by {date}',
     'pick.noDate': 'No date', 'pick.rangeSum': { one: '{from} – {to} · 1 day', other: '{from} – {to} · {n} days' }, 'pick.dayOnly': '{d}', 'pick.rangeChip': '{from}–{to}', 'pick.rangeHint': 'Tap another day to make it a range', 'pick.setDay': 'Set this day', 'pick.setRange': 'Set these dates',
     'pick.cellStart': 'start', 'pick.cellEnd': 'end', 'pick.cellMid': 'in range',
     'span.progressRange': '{range} · day {n}', 'span.rangeSame': '{from}–{to}',
@@ -1878,7 +1970,7 @@ App.i18n = (function () {
   /* 문장 안에 끼울 때: 영어는 'Today' → 'today' ('Due today'처럼 첫 글자만 대문자 규칙 지키기) */
   function relDayIn(s) {
     var r = relDay(s), n = U.diffDays(U.today(), s);
-    return lang === 'en' && n >= -1 && n <= 2 ? r.charAt(0).toLowerCase() + r.slice(1) : r;
+    return lang === 'en' && n >= -1 && n <= 1 ? r.charAt(0).toLowerCase() + r.slice(1) : r;   /* 영어 모레는 요일 이름(Wednesday) — 대문자 그대로 (구역 4) */
   }
 
   return { t: t, setLang: setLang, get lang() { return lang; }, get locale() { return locale; }, relDayIn: relDayIn, dateLong: dateLong, dateShort: dateShort, dateNoWeek: dateNoWeek,
@@ -2117,7 +2209,9 @@ App.repeat = (function () {
     if (rule.freq === 'week') {
       var days = rule.days && rule.days.length ? rule.days : [U.dow(anchor)];
       if (days.indexOf(U.dow(s)) < 0) return false;
-      var weeks = Math.floor(U.diffDays(U.startOfWeek(anchor, 0), U.startOfWeek(s, 0)) / 7);
+      /* 격주 · N주마다의 '주' = 규칙이 지닌 주 시작(wkst · RFC 5545) — 월요일 시작으로 쓰는 사람의 '격주 토 · 일'이 다른 주로 갈라지던 것 (구역 2).
+         wkst 없는 옛 규칙은 일요일 시작 그대로(이미 있는 반복의 날짜가 옮겨지지 않게) */
+      var ws = rule.wkst === 1 ? 1 : 0, weeks = Math.floor(U.diffDays(U.startOfWeek(anchor, ws), U.startOfWeek(s, ws)) / 7);
       return weeks % every === 0;
     }
     if (rule.freq === 'month' || rule.freq === 'year') {
@@ -2199,8 +2293,15 @@ App.tasks = (function () {
   function isDone(t, key) { return !!t.done[key]; }
   function doneDay(t) { return t.done.once ? U.ymd(new Date(t.done.once)) : null; }
 
+  /* 격주 · N주마다 규칙에 주 시작(wkst)을 담음 — 만들 때(또는 규칙을 바꿀 때)의 설정 주 시작. 같은 규칙을 다시 고르면 옛 값 그대로 (구역 2) */
+  function withWkst(d, rule, old) {
+    if (!rule || rule.freq !== 'week' || (rule.every || 1) < 2 || rule.wkst != null) return rule;
+    if (old && R.same(old, rule)) return old.wkst != null ? Object.assign({}, rule, { wkst: old.wkst }) : rule;
+    return Object.assign({}, rule, { wkst: d.settings && d.settings.weekStart === 1 ? 1 : 0 });
+  }
   function add(d, f) {
     var t = M.newTask(f);
+    if (t.repeat) t.repeat = withWkst(d, t.repeat, null);
     t.title = (t.title || '').trim();
     t.alerts = Array.isArray(f.alerts) ? f.alerts.slice() : [];   /* 개수 자르기는 normalize가(틀린 칸을 거른 뒤) */   /* 알림은 고른 것만 — 시간을 넣어도 저절로 붙지 않음 (사용자 11-01) */
     /* "매일 항생제 11월 10일까지" = 11월 10일까지 반복 (6호 1번) */
@@ -2286,6 +2387,7 @@ App.tasks = (function () {
     /* 반복 규칙을 다시 골라도 앞으로 끝날 날(until)은 이어 받음 — 고르기 창의 칸에는 until이 없어서 (6호 1번 고치며) */
     if (t.repeat && oldRepeat && oldRepeat.until && !oldRepeat.ended && oldRepeat.until >= today2 && t.repeat !== oldRepeat && t.repeat.until === undefined) t.repeat = Object.assign({}, t.repeat, { until: oldRepeat.until });
     if (t.repeat && t.repeat.day && 'date' in patch && !('repeat' in patch)) { t.repeat = Object.assign({}, t.repeat); delete t.repeat.day; }
+    if (t.repeat && t.repeat !== oldRepeat) t.repeat = withWkst(d, t.repeat, oldRepeat);
     /* 할 날 · 언제까지는 어느 길로 바꾸든 같은 규칙: 할 날을 언제까지 뒤로 옮기면 언제까지도 그날로, 언제까지를 할 날 앞으로 당기면 할 날도 그날로 (6호 4번 — 날짜 고르기 창만 어긋나던 문제) */
     if (!t.repeat && t.date && t.due && t.due < t.date) {
       if ('date' in patch && !('due' in patch)) t.due = t.date;
@@ -2484,6 +2586,32 @@ App.tasks = (function () {
     d.lists.forEach(function (l) { if (l.id === id) { l.deletedAt = U.now(); l.updatedAt = U.now(); } });
   }
   function restoreList(d, id) { d.lists.forEach(function (l) { if (l.id === id) { l.deletedAt = null; l.updatedAt = U.now(); } }); }
+  /* ── 복사 (11-16 · 사용자 '여자친구: 학원 레슨 진도 · 숙제는 매주 조금씩 달라서 반복은 안 맞고, 지난 날 일정을 복사해 고쳐 쓰고 싶음') ──
+     규칙 한 줄: 복사한 일은 '새로 적은 일'이다 — 이름 · 메모 · 목록 · 시간 · 중요 · 알림 · 세부 할 일(이름만)을 그대로, 끝낸 기록은 없이.
+     - 반복 일은 복사하지 않는다(그 일은 반복 규칙대로 이미 그날들에 뜸 — 복사하면 같은 일이 두 줄 · null).
+     - 날짜는 받는 날로. 기간 일(할 날 ~ 언제까지)은 같은 길이 그대로 옮김 · 언제까지만 있던 일은 받는 날까지로 · 날짜 없던 일(언제든)은 받는 날에.
+     - 끝낸 표시 · 세부 체크 · 미룬 알림 · 건너뜀 · 옮김은 가져오지 않음(지난주에 끝낸 레슨이 이번 주 뼈대가 되는 것이 목적).
+     - 지운 목록에 있던 일이면 목록 없이. 순서는 부르는 쪽이 정함(copyMany = 보낸 차례 그대로 그날 맨 위). */
+  function copyTo(d, id, day, order) {
+    var s = find(d, id); if (!s || s.deletedAt || s.repeat || !day) return null;
+    var home = s.date || s.due;
+    var f = {
+      title: s.title, note: s.note || '', listId: s.listId && list(d, s.listId) ? s.listId : null,
+      time: s.time || null, priority: s.priority || 0,
+      date: s.date || !home ? day : null,
+      due: s.due ? U.addDays(s.due, U.diffDays(home, day)) : null,
+      alerts: JSON.parse(JSON.stringify(s.alerts || [])),
+      subtasks: (s.subtasks || []).map(function (x) { return { id: U.uid(), title: x.title }; })
+    };
+    if (order != null) f.order = order;
+    return add(d, f);
+  }
+  function copyMany(d, ids, day) {
+    var base = U.now(), out = [];
+    ids.forEach(function (id, i) { var t = copyTo(d, id, day, base - i * 0.01); if (t) out.push(t); });   /* 보낸 차례 그대로 위 → 아래 (붙여 넣기와 같은 규칙) */
+    return out;
+  }
+
   function list(d, id) { for (var i = 0; i < d.lists.length; i++) if (d.lists[i].id === id && !d.lists[i].deletedAt) return d.lists[i]; return null; }
   function alive(x) { return !x.deletedAt; }
 
@@ -2509,7 +2637,7 @@ App.tasks = (function () {
     return n;
   }
 
-  return { find: find, keyFor: keyFor, isDone: isDone, doneDay: doneDay, add: add, update: update, toggle: toggle, setDone: setDone, snooze: snooze,
+  return { copyTo: copyTo, copyMany: copyMany, find: find, keyFor: keyFor, isDone: isDone, doneDay: doneDay, add: add, update: update, toggle: toggle, setDone: setDone, snooze: snooze,
     toggleSub: toggleSub, setSubDone: setSubDone, subDoneCount: subDoneCount, isSubDone: isSubDone, addSub: addSub, renameSub: renameSub, removeSub: removeSub, reorderSub: reorderSub,
     remove: remove, skip: skip, unskip: unskip, moveOnce: moveOnce, clearDates: clearDates, endRepeat: endRepeat, turnOffRepeat: turnOffRepeat, hasPast: hasPast, restore: restore, moveToDay: moveToDay, reorder: reorder, addList: addList, updateList: updateList, removeList: removeList, restoreList: restoreList,
     list: list, alive: alive, applyOps: applyOps, normalize: normalize, alertKey: alertKey, MAX_ALERTS: MAX_ALERTS, R: R };
@@ -2677,10 +2805,11 @@ App.query = (function () {
      돌려줌 { v(todayView) · late(지난 일 · 날짜 순) · now(오늘) · any(언제든) · hidden(숨긴 끝낸 일 수 — 지난 일 포함) · lateOpen(안 끝낸 지난 일이 있나) } */
   function todayParts(d, settings, o) {
     o = o || {};
-    var v = todayView(d, undefined, o.at), hidden = 0;
-    function part(items, isLate) { var r = visible(isLate ? sortLate(items.slice()) : sort(items.slice(), settings, o.held), settings, o.showDone); hidden += r.hidden; return r.items; }
+    var v = todayView(d, undefined, o.at), hidden = 0, lateHidden = 0;
+    function part(items, isLate) { var r = visible(isLate ? sortLate(items.slice()) : sort(items.slice(), settings, o.held), settings, o.showDone); hidden += r.hidden; if (isLate) lateHidden += r.hidden; return r.items; }
     var late = part(v.overdue, true), now = part(v.today), any = part(v.anytime);
-    return { v: v, late: late, now: now, any: any, hidden: hidden, lateOpen: v.overdue.some(function (it) { return !done(it); }) };
+    /* lateHidden = 그중 지난 일 몫 — 지난 일 띠가 접혔거나 없으면 '끝낸 일 n개 보기'를 눌러도 안 보이므로 화면이 셈에서 뺌 (구역 1) */
+    return { v: v, late: late, now: now, any: any, hidden: hidden, lateHidden: lateHidden, lateOpen: v.overdue.some(function (it) { return !done(it); }) };
   }
   /* 그날 뒤로 처음 나오는 안 끝낸 일(할 날이 있는 일 · 반복 · 같은 날이면 오늘 화면 차례) — 빈 오늘 화면의 '다음 할 일' · 위젯이 같이 씀 (24호). 한 해까지 */
   function nextUp(d, day) {
@@ -2764,6 +2893,42 @@ App.query = (function () {
   function doneLog(d, day) {
     return forDay(d, day).filter(done).concat(doneOn(d, day), repeatDoneOn(d, day))
       .sort(function (a, b) { return (a.task.done[a.key] || 0) - (b.task.done[b.key] || 0); });
+  }
+  /* 한 일이 있을 수 있는 날들(이른 순) — '한 일' 창의 ‹ ›가 기록 있는 날만 넘기게 (11-14 · 빈 날을 하루씩 넘기게 하지 않음).
+     후보 = 끝낸 기록마다 '그 일이 놓인 날'과 '끝낸 날'(doneLog가 보는 두 자리). 정말 비지 않는지는 doneNear가 doneLog로 확인 */
+  function doneDays(d) {
+    var set = {};
+    live(d).forEach(function (t) {
+      if (!t.repeat) { if (t.done.once) { var a = home(t), b = T.doneDay(t); if (a) set[a] = 1; if (b) set[b] = 1; } return; }
+      var m = movedOf(t);
+      Object.keys(t.done).forEach(function (k) { if (k === 'once') return; set[m[k] || k] = 1; set[U.ymd(new Date(t.done[k]))] = 1; });
+    });
+    return Object.keys(set).sort();
+  }
+  /* 다른 날에서 가져오기(11-16) — 그날 가져올 수 있는 일: 그날 자리에 놓인 반복 아닌 일(끝낸 일 포함 · 지난주에 끝낸 레슨이 뼈대) · 화면과 같은 차례.
+     반복 일은 몇 개인지만(복사하지 않음 · tasks.copyTo). 그날을 지나가기만 하는 기간 일 · 그날 끝낸 다른 날 일은 그날 자리가 아니라 뺌 */
+  function copySource(d, day) {
+    /* 날짜 없던 일을 그날 끝낸 것(언제든 · 끝낸 날에 남음)은 그날에 '놓인' 일이 아니라 뺌 — copyTo도 받지 않음 */
+    var all = forDay(d, day), items = all.filter(function (it) { return !it.task.repeat && (it.task.date || it.task.due); });
+    var reps = all.filter(function (it) { return it.task.repeat; }).length;
+    var seen = {}; items = items.filter(function (it) { if (seen[it.task.id]) return false; seen[it.task.id] = 1; return true; });
+    return { items: sort(items, null), repeats: reps };   /* 끝낸 일 '아래로' 가라앉힘 없이 시간 · 손 순서만 — 가져온 일은 모두 안 한 일이라 원래 차례 그대로 */
+  }
+  /* 받는 날에 이미 같은 일(이름 · 시간 · 목록이 같은 반복 아닌 일)이 있나 — 막지 않고 '이미 있어요'만 (같은 수업을 받는 학생이 둘일 수 있음) */
+  function sameOn(d, day, t) {
+    var key = function (x) { return [(x.title || '').trim(), x.time || '', x.listId || ''].join('|'); }, k = key(t);
+    return forDay(d, day).some(function (it) { return !it.task.repeat && it.task.id !== t.id && key(it.task) === k; });
+  }
+
+  /* day에서 dir(-1 앞 · +1 뒤)쪽으로 가장 가까운 '한 일이 있는 날' · 없으면 null.
+     오늘이나 지난 날에서 뒤로 넘길 때는 오늘까지만 — 앞날 칸에 미리 끝내 둔 일로 건너뛰지 않게(앞날에서 연 창은 그대로 더 감) */
+  function doneNear(d, day, dir) {
+    return indexed(d, function () {
+      var days = doneDays(d), i, last = day > U.today() ? '9999-12-31' : U.today();
+      if (dir < 0) { for (i = days.length - 1; i >= 0; i--) if (days[i] < day && doneLog(d, days[i]).length) return days[i]; }
+      else for (i = 0; i < days.length; i++) if (days[i] > day && days[i] <= last && doneLog(d, days[i]).length) return days[i];
+      return null;
+    });
   }
 
   /* 이날이 '할 날 ~ 언제까지' 기간 안인 일(시작 날 다음 날부터 · 아직 안 끝낸 것만) — 달력에서 고른 날 목록에 '이어지는 일'로.
@@ -2900,7 +3065,7 @@ App.query = (function () {
   }
 
   return { indexed: indexed, live: live, place: place, home: home, occurs: occurs, occItems: occItems, moveRange: moveRange, isOccKey: function (t, k) { return base(t, k) || !!t.done[k]; }, liveOcc: liveOcc, showsOn: showsOn, done: done, sort: sort, sortLate: sortLate, rare: rare, visible: visible, forDay: forDay, spanOn: spanOn, span: span, spanAt: spanAt,
-    todayView: todayView, todayParts: todayParts, nextUp: nextUp, doneLog: doneLog, repeatDoneOn: repeatDoneOn, splitDue: splitDue, listView: listView, doneOn: doneOn, dayStats: dayStats, remaining: remaining, search: search, widgetSnapshot: widgetSnapshot };
+    todayView: todayView, todayParts: todayParts, nextUp: nextUp, doneLog: doneLog, doneDays: doneDays, doneNear: doneNear, copySource: copySource, sameOn: sameOn, repeatDoneOn: repeatDoneOn, splitDue: splitDue, listView: listView, doneOn: doneOn, dayStats: dayStats, remaining: remaining, search: search, widgetSnapshot: widgetSnapshot };
 })();
 
 </script>
@@ -2921,9 +3086,25 @@ App.parse = (function () {
   /* 'sun' · 'sat' · 'wed'처럼 보통 낱말과 겹치는 줄임말은 받지 않는다 */
   var EN_D = '(sunday|monday|tuesday|wednesday|thursday|friday|saturday|mon|tue|tues|thu|thur|thurs|fri)';
 
+  /* 'every ~' 뒤에서는 요일 자리라 줄임말을 다 받는다 ('every mon wed fri' · 36호) */
+  var EN_ALL = '(?:sunday|monday|tuesday|wednesday|thursday|friday|saturday|tues|thurs|thur|sun|mon|tue|wed|thu|fri|sat)';
+
   function enDow(s) { return EN_DOW[s.slice(0, 3).toLowerCase()]; }
   function nextDow(dow, from) { var k = (dow - U.dow(from) + 7) % 7; return U.addDays(from, k); }
-  function weekOf(offsetWeeks, dow) { var mon = U.startOfWeek(U.today(), 1); return U.addDays(mon, offsetWeeks * 7 + (dow + 6) % 7); }
+  /* '이번 주 · 다음 주'의 주 = 설정의 주 시작 요일로 나눈 주 — 앱 달력 한 줄과 같은 주 (36호: 늘 월요일로 셈해 일요일에 '이번 주 금 · 다음 주 금'이 같은 날) */
+  var weekStart = 0;
+  function weekOf(offsetWeeks, dow) { var st = U.startOfWeek(U.today(), weekStart); return U.addDays(st, offsetWeeks * 7 + (dow - weekStart + 7) % 7); }
+  /* 반복의 첫 회차 = 오늘부터 처음 뜨는 날 — 짧은 달 · 평년은 그달 마지막 날(반복 규칙 occursOn과 같은 셈). '매달 31일'을 11월에 적으면 11-30부터 (36호) */
+  function firstMonthly(d) {
+    var t = U.parse(U.today());
+    for (var i = 0; i < 2; i++) { var y = t.getFullYear(), m = t.getMonth() + i, x = new Date(y, m, 1), s = U.ymd(new Date(x.getFullYear(), x.getMonth(), Math.min(d, U.daysInMonth(x.getFullYear(), x.getMonth())))); if (s >= U.today()) return s; }
+    return null;
+  }
+  function firstYearly(mo, d) {
+    var y = U.parse(U.today()).getFullYear();
+    for (var i = 0; i < 2; i++, y++) { var s = U.ymd(new Date(y, mo - 1, Math.min(d, U.daysInMonth(y, mo - 1)))); if (s >= U.today()) return s; }
+    return null;
+  }
   /* 2월 29일은 윤년이 있으니 받아 두고, 실제 날짜는 md()가 그날이 있는 해로 고른다 */
   function validMD(m, d) { return m >= 1 && m <= 12 && d >= 1 && d <= (m === 2 ? 29 : U.daysInMonth(2001, m - 1)); }
   function md(m, d) {
@@ -2946,10 +3127,34 @@ App.parse = (function () {
     }
     return null;
   }
+  /* 돌아오는 날짜 조각('11월 1일' = 해마다 · '7일' = 달마다 · '금요일' = 주마다)의 앞뒤 찾기 — '부터 ~ 까지'를 함께 풀 때 (구역 4).
+     next(from) = from 이후(포함) 첫날 · prev(to) = to 이전(포함) 마지막 날 */
+  function cycMD(m, d) {
+    function at(y) { return d <= U.daysInMonth(y, m - 1) ? y + '-' + U.pad(m) + '-' + U.pad(d) : null; }
+    return {
+      next: function (from) { for (var y = U.parse(from).getFullYear(), i = 0; i < 9; i++, y++) { var s = at(y); if (s && s >= from) return s; } return null; },
+      prev: function (to) { for (var y = U.parse(to).getFullYear(), i = 0; i < 9; i++, y--) { var s = at(y); if (s && s <= to) return s; } return null; }
+    };
+  }
+  function cycDay(d) {
+    function at(y, m) { var x = new Date(y, m, 1); return d <= U.daysInMonth(x.getFullYear(), x.getMonth()) ? U.ymd(new Date(x.getFullYear(), x.getMonth(), d)) : null; }
+    return {
+      next: function (from) { var p = U.parse(from); for (var i = 0; i < 14; i++) { var s = at(p.getFullYear(), p.getMonth() + i); if (s && s >= from) return s; } return null; },
+      prev: function (to) { var p = U.parse(to); for (var i = 0; i < 14; i++) { var s = at(p.getFullYear(), p.getMonth() - i); if (s && s <= to) return s; } return null; }
+    };
+  }
+  /* 요일만 적은 시작('금요일부터')은 늘 앞으로 오는 날 — 지난 주의 진행 중 기간으로 풀지 않음(fwd · 구역 4 재확인) */
+  function cycDow(dw) { return { fwd: true, next: function (from) { return nextDow(dw, from); }, prev: function (to) { return U.addDays(to, -((U.dow(to) - dw + 7) % 7)); } }; }
   /* 여러 요일 중 오늘부터 가장 먼저 오는 날 */
   function firstOf(days) { var best = null; days.forEach(function (dw) { var s = nextDow(dw, U.today()); if (!best || s < best) best = s; }); return best; }
-  /* '금요일'의 '일'을 일요일로 세지 않게 '요일'을 먼저 뺀다 ('매주 금요일' → 금 · 일 두 요일이 되던 오류 · 10-31 시험에서 찾음) */
-  function koDays(s) { var out = []; s.replace(/요일/g, '').replace(/[월화수목금토일]/g, function (c) { if (out.indexOf(KO_DOW[c]) < 0) out.push(KO_DOW[c]); }); return out.sort(); }
+  /* '금요일'의 '일'을 일요일로 세지 않게 '요일'을 먼저 뺀다 ('매주 금요일' → 금 · 일 두 요일이 되던 오류 · 10-31 시험에서 찾음).
+     '월~금'은 그 사이 요일 전부(금~월 = 금 · 토 · 일 · 월) — 구역 4 */
+  function koDays(s) {
+    var out = [], add = function (k) { if (out.indexOf(k) < 0) out.push(k); };
+    s = s.replace(/요일/g, '').replace(/([월화수목금토일]) ?~ ?([월화수목금토일])/g, function (all, a, b) { for (var k = KO_DOW[a], n = 0; n < 7; n++, k = (k + 1) % 7) { add(k); if (k === KO_DOW[b]) break; } return ''; });
+    s.replace(/[월화수목금토일]/g, function (c) { add(KO_DOW[c]); });
+    return out.sort();
+  }
   function hour(h, ampm) {
     h = +h;
     if (ampm === 'am' || ampm === '오전' || ampm === '아침' || ampm === '새벽') return h === 12 ? 0 : h;
@@ -2976,78 +3181,110 @@ App.parse = (function () {
     { type: 'repeat', re: '평일마다|평일|every weekday|weekdays', fn: function () { return { repeat: { freq: 'week', every: 1, days: [1, 2, 3, 4, 5] } }; } },
     { type: 'repeat', re: '주말마다|매 ?주말|every weekend', fn: function () { return { repeat: { freq: 'week', every: 1, days: [0, 6] } }; } },
     /* '매주 금요일까지 보고서' = 매주 금요일(마다 내는 일) — '까지'가 붙어도 요일 반복으로 잡는다. 안 그러면 '매주'(오늘 요일) + '금요일까지'(반복 끝)로 갈라져 보고서가 이번 금요일 뒤 사라짐 (6호 재확인 1번) */
-    { type: 'repeat', re: '매주 ?(' + KD + '(?:요일)?(?:[,·와과 ]*' + KD + '(?:요일)?)*)(?:까지|에|마다)?', fn: function (m) { var ds = koDays(m[1]); return { repeat: { freq: 'week', every: 1, days: ds }, date: firstOf(ds) }; } },
+    { type: 'repeat', re: '매주 ?(' + KD + '(?:요일)?(?:[,·와과/ ]*' + KD + '(?:요일)?| ?~ ?' + KD + '(?:요일)?)*)(?:까지|에|마다)?', fn: function (m) { var ds = koDays(m[1]); return { repeat: { freq: 'week', every: 1, days: ds }, date: firstOf(ds) }; } },
     { type: 'repeat', re: '(' + KD + ')요일마다', fn: function (m) { var dw = KO_DOW[m[1]]; return { repeat: { freq: 'week', every: 1, days: [dw] }, date: nextDow(dw, U.today()) }; } },
     { type: 'repeat', re: '격주 ?(' + KD + ')(?:요일)?', fn: function (m) { var dw = KO_DOW[m[1]]; return { repeat: { freq: 'week', every: 2, days: [dw] }, date: nextDow(dw, U.today()) }; } },
     { type: 'repeat', re: '매주|every week|weekly', fn: function () { return { repeat: { freq: 'week', every: 1, days: [U.dow(U.today())] } }; } },
-    { type: 'repeat', re: 'every ' + EN_D, fn: function (m) { var dw = enDow(m[1]); return { repeat: { freq: 'week', every: 1, days: [dw] }, date: nextDow(dw, U.today()) }; } },
+    { type: 'repeat', re: 'every (' + EN_ALL + '(?:(?:,? and |, ?| )' + EN_ALL + ')*)', fn: function (m) {
+      var ds = []; m[1].toLowerCase().replace(/sun|mon|tue|wed|thu|fri|sat/g, function (w) { var dw = enDow(w); if (ds.indexOf(dw) < 0) ds.push(dw); });
+      ds.sort(); return { repeat: { freq: 'week', every: 1, days: ds }, date: firstOf(ds) };
+    } },
     { type: 'repeat', re: '(\\d{1,2})일마다|every (\\d{1,2}) days', fn: function (m) { var n = +(m[1] || m[2]); return n >= 1 ? { repeat: { freq: 'day', every: n, days: [] } } : null; } },
     { type: 'repeat', re: '(\\d)주마다|every (\\d) weeks', fn: function (m) { var n = +(m[1] || m[2]); return n >= 1 ? { repeat: { freq: 'week', every: n, days: [U.dow(U.today())] } } : null; } },
-    { type: 'repeat', re: '(?:매달|매월) ?(\\d{1,2})일|monthly on the (\\d{1,2})(?:st|nd|rd|th)?', fn: function (m) { var d = dayOnly(+(m[1] || m[2])); return d ? { repeat: { freq: 'month', every: 1, days: [] }, date: d } : null; } },
+    { type: 'repeat', re: '(?:매달|매월) ?(\\d{1,2})일|monthly on the (\\d{1,2})(?:st|nd|rd|th)?', fn: function (m) {
+      var n = +(m[1] || m[2]); if (n < 1 || n > 31) return null;
+      var rep = { freq: 'month', every: 1, days: [] }; if (n > 28) rep.day = n;   /* 첫 회차가 짧은 달 말일이어도 다음 달엔 n일 (반복 규칙 day) */
+      return { repeat: rep, date: firstMonthly(n) };
+    } },
     /* '매달 말일 · 매월 말일 · 월말마다' = 매달 그달 마지막 날 (day 31 → 짧은 달은 말일 · 6호 3번) */
     { type: 'repeat', re: '(?:매달|매월) ?(?:말일|월말)|월말마다|every month end', fn: function () { var t = U.parse(U.today()); return { repeat: { freq: 'month', every: 1, days: [], day: 31 }, date: U.ymd(new Date(t.getFullYear(), t.getMonth() + 1, 0)) }; } },
     { type: 'repeat', re: '매달|매월|every month|monthly', fn: function () { return { repeat: { freq: 'month', every: 1, days: [] } }; } },
-    { type: 'repeat', re: '매년 ?(\\d{1,2})월 ?(\\d{1,2})일', fn: function (m) { return validMD(+m[1], +m[2]) ? { repeat: { freq: 'year', every: 1, days: [] }, date: md(+m[1], +m[2]) } : null; } },
+    { type: 'repeat', re: '매년 ?(\\d{1,2})월 ?(\\d{1,2})일', fn: function (m) {
+      var mo = +m[1], n = +m[2]; if (!validMD(mo, n)) return null;
+      var rep = { freq: 'year', every: 1, days: [] }; if (n > U.daysInMonth(2001, mo - 1)) rep.day = n;   /* 2월 29일 = 평년엔 28일 · 윤년엔 29일 */
+      return { repeat: rep, date: firstYearly(mo, n) };
+    } },
     { type: 'repeat', re: '매년|해마다|every year|yearly|annually', fn: function () { return { repeat: { freq: 'year', every: 1, days: [] } }; } },
 
-    /* 날짜 (뒤에 '까지' · by 가 붙으면 언제까지) */
+    /* 날짜 (뒤에 '까지' · by 가 붙으면 언제까지 · '부터'는 할 날) — 날짜 규칙은 모두 '부터'를 받는다('다음 주부터 · 오늘부터 매일' · 구역 4) */
     /* '내일은 · 오늘은 · 모레엔'처럼 뒤에 조사가 붙어도 날짜로 (4호 3번) */
-    { type: 'date', re: '(by |due )?(오늘|today|tonight)(까지|에|은|엔)?', fn: function (m) { return dateTok(U.today(), m[1] || m[3], 'rel'); } },   /* 'tonight' = 오늘 (시각은 따로 적은 대로 · 18호) */
+    { type: 'date', re: '(by |due )?(오늘|today|tonight)(까지|부터|에|은|엔)?', fn: function (m) { return dateTok(U.today(), m[1] || m[3], 'rel'); } },   /* 'tonight' = 오늘 (시각은 따로 적은 대로 · 18호) */
     { type: 'date', re: '(by |due )?(내일|tomorrow|tmrw?)(까지|부터|에|은|엔)?', fn: function (m) { return dateTok(U.addDays(U.today(), 1), m[1] || m[3], 'rel'); } },
-    { type: 'date', re: '(모레)(까지|에|는|엔)?', fn: function (m) { return dateTok(U.addDays(U.today(), 2), m[2], 'rel'); } },
-    { type: 'date', re: '(글피)(까지|에|는|엔)?', fn: function (m) { return dateTok(U.addDays(U.today(), 3), m[2], 'rel'); } },
+    { type: 'date', re: '(모레)(까지|부터|에|는|엔)?', fn: function (m) { return dateTok(U.addDays(U.today(), 2), m[2], 'rel'); } },
+    { type: 'date', re: '(글피)(까지|부터|에|는|엔)?', fn: function (m) { return dateTok(U.addDays(U.today(), 3), m[2], 'rel'); } },
     /* '3일 뒤 · 3일 후 · 2주 뒤 · 일주일 후 · 한 달 뒤 · in 3 days' — 'N일' 날짜보다 먼저 (6호 3번: '3일 뒤 병원'이 그달 3일로 잡히던 문제) */
-    { type: 'date', re: '(\\d{1,3})일 ?(?:뒤|후)(까지|에|에는)?', fn: function (m) { return +m[1] >= 1 ? dateTok(U.addDays(U.today(), +m[1]), m[2], 'rel') : null; } },
-    { type: 'date', re: '(\\d{1,2}|한|두|세|네)? ?주(?:일)? ?(?:뒤|후)(까지|에|에는)?|일주일 ?(?:뒤|후)(까지|에|에는)?', fn: function (m) {
+    { type: 'date', re: '(\\d{1,3})일 ?(?:뒤|후)(까지|부터|에|에는)?', fn: function (m) { return +m[1] >= 1 ? dateTok(U.addDays(U.today(), +m[1]), m[2], 'rel') : null; } },
+    { type: 'date', re: '(이틀|사흘|나흘) ?(?:뒤|후)(까지|부터|에|에는)?', fn: function (m) { return dateTok(U.addDays(U.today(), { '이틀': 2, '사흘': 3, '나흘': 4 }[m[1]]), m[2], 'rel'); } },
+    { type: 'date', re: '(\\d{1,2}|한|두|세|네)? ?주(?:일)? ?(?:뒤|후)(까지|부터|에|에는)?|일주일 ?(?:뒤|후)(까지|부터|에|에는)?', fn: function (m) {
       var n = m[1] ? ({ '한': 1, '두': 2, '세': 3, '네': 4 }[m[1]] || +m[1]) : 1;
       return n >= 1 ? dateTok(U.addDays(U.today(), 7 * n), m[2] || m[3], 'rel') : null;
     } },
-    { type: 'date', re: '(\\d{1,2}|한|두|세)? ?(?:달|개월) ?(?:뒤|후)(까지|에|에는)?', fn: function (m) {
+    { type: 'date', re: '(\\d{1,2}|한|두|세)? ?(?:달|개월) ?(?:뒤|후)(까지|부터|에|에는)?', fn: function (m) {
       var n = m[1] ? ({ '한': 1, '두': 2, '세': 3 }[m[1]] || +m[1]) : 1, t = U.parse(U.today());
       var x = new Date(t.getFullYear(), t.getMonth() + n, 1), d = Math.min(t.getDate(), U.daysInMonth(x.getFullYear(), x.getMonth()));
       return n >= 1 ? dateTok(U.ymd(new Date(x.getFullYear(), x.getMonth(), d)), m[2], 'rel') : null;
     } },
     { type: 'date', re: 'in (\\d{1,3}) (days?|weeks?)', fn: function (m) { return dateTok(U.addDays(U.today(), +m[1] * (/w/.test(m[2]) ? 7 : 1)), null, 'rel'); } },
+    /* '다음 달 5일 · 다음 달 말일' = 한 조각 — 날짜 칸이 하나라 '다음 달'(1일)이 먼저 잡히면 뒤의 '5일'이 제목에 남던 것 (36호). 그달에 없는 날(31일)은 그달 말일 */
+    { type: 'date', re: '(다음 ?달|담달|next month) ?(?:(\\d{1,2})일|(말일|말))(까지|부터|에)?', fn: function (m) {
+      var n = m[2] ? +m[2] : 31; if (n < 1 || n > 31) return null;
+      var t = U.parse(U.today()), x = new Date(t.getFullYear(), t.getMonth() + 1, 1);
+      return dateTok(U.ymd(new Date(x.getFullYear(), x.getMonth(), Math.min(n, U.daysInMonth(x.getFullYear(), x.getMonth())))), m[4]);
+    } },
     /* '말일 · 월말 · 이번 달 말' = 이번 달 마지막 날 */
     { type: 'date', re: '(이번 ?달 ?말일?|이번 ?달 ?말|말일|월말)(까지|에)?', fn: function (m) { var t = U.parse(U.today()); return dateTok(U.ymd(new Date(t.getFullYear(), t.getMonth() + 1, 0)), m[2]); } },
-    /* '이번 주 금요일'이 이미 지났으면(일요일에 적음) 다음에 오는 금요일로 — 지난 일로 바로 가지 않게 (4호 4번) */
-    { type: 'date', re: '(이번 ?주|다음 ?주|담주) ?(' + KD + ')요일?(까지|에)?', fn: function (m) {
-      var s = weekOf(/이번/.test(m[1]) ? 0 : 1, KO_DOW[m[2]]);
+    /* '이번 달까지 · 이번 주까지' = 그 달 · 그 주(설정의 주 시작으로 나눈 주)의 마지막 날까지 (구역 4) */
+    { type: 'date', re: '이번 ?달(까지)', fn: function (m) { var t = U.parse(U.today()); return dateTok(U.ymd(new Date(t.getFullYear(), t.getMonth() + 1, 0)), m[1]); } },
+    { type: 'date', re: '이번 ?주(까지)', fn: function (m) { return dateTok(weekOf(0, (weekStart + 6) % 7), m[1]); } },
+    /* '이번 주 금요일'이 이미 지났으면(일요일에 적음) 다음에 오는 금요일로 — 지난 일로 바로 가지 않게 (4호 4번) · '다다음 주' = 두 주 뒤 (구역 4) */
+    { type: 'date', re: '(이번 ?주|다다음 ?주|다음 ?주|담주) ?(' + KD + ')요일?(까지|부터|에)?', fn: function (m) {
+      var s = weekOf(/이번/.test(m[1]) ? 0 : /다다음/.test(m[1]) ? 2 : 1, KO_DOW[m[2]]);
       if (s < U.today()) s = U.addDays(s, 7);
       return dateTok(s, m[3]);
     } },
-    { type: 'date', re: '(' + KD + ')요일(까지|에|엔|에는)?', fn: function (m) { return dateTok(nextDow(KO_DOW[m[1]], U.today()), m[2]); } },
+    { type: 'date', re: '(' + KD + ')요일(까지|부터|에|엔|에는)?', fn: function (m) { return cyc(dateTok(nextDow(KO_DOW[m[1]], U.today()), m[2]), cycDow(KO_DOW[m[1]])); } },
     /* 'this friday'의 'this'도 날짜 조각으로 — 제목에 'this'가 남던 것 (18호) */
     { type: 'date', re: '(by |due |on )?(next |this )?' + EN_D, fn: function (m) { var dw = enDow(m[3]), s = nextDow(dw, U.today()); if (/next/i.test(m[2] || '') && s === U.today()) s = U.addDays(s, 7); return dateTok(s, m[1] === 'on ' ? null : m[1]); } },
-    { type: 'date', re: '(\\d{1,2})월 ?(\\d{1,2})일(까지|부터|에)?', fn: function (m) { return validMD(+m[1], +m[2]) ? dateTok(md(+m[1], +m[2]), m[3]) : null; } },
-    { type: 'date', re: '(by |due |on )?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* (\\d{1,2})(?:st|nd|rd|th)?', fn: function (m) { var mo = EN_MON[m[2].toLowerCase()] + 1; return validMD(mo, +m[3]) ? dateTok(md(mo, +m[3]), m[1] === 'on ' ? null : m[1]) : null; } },
+    { type: 'date', re: '(\\d{1,2})월 ?(\\d{1,2})일(까지|부터|에)?', fn: function (m) { return validMD(+m[1], +m[2]) ? cyc(dateTok(md(+m[1], +m[2]), m[3]), cycMD(+m[1], +m[2])) : null; } },
+    { type: 'date', re: '(by |due |on )?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* (\\d{1,2})(?:st|nd|rd|th)?', fn: function (m) { var mo = EN_MON[m[2].toLowerCase()] + 1; return validMD(mo, +m[3]) ? cyc(dateTok(md(mo, +m[3]), m[1] === 'on ' ? null : m[1]), cycMD(mo, +m[3])) : null; } },
     /* "11/3"만 날짜로 ("2.5 리터"처럼 점은 숫자일 때가 많아서 받지 않음 · 점검원 1호 23번).
        1/2 · 1/3 · 2/3 · 3/4처럼 흔한 분수는 '반 알' 같은 뜻일 때가 많아 날짜로 잡지 않는다 — 뒤에 '까지 · 에'가 붙으면 날짜 (1호 23번 재확인) */
-    { type: 'date', re: '(\\d{1,2})/(\\d{1,2})(까지|에)?', fn: function (m) {
-      var a = +m[1], b = +m[2];
-      if (!m[3] && a < b && b <= 4) return null;
-      return validMD(a, b) ? dateTok(md(a, b), m[3]) : null;
+    { type: 'date', re: '(by |due )?(\\d{1,2})/(\\d{1,2})(까지|부터|에)?', fn: function (m) {
+      var a = +m[2], b = +m[3];
+      if (!m[4] && !m[1] && a < b && b <= 4) return null;
+      return validMD(a, b) ? cyc(dateTok(md(a, b), m[1] || m[4]), cycMD(a, b)) : null;
     } },
-    { type: 'date', re: '(이번 ?주말|주말)(까지|에)?|(this )?weekend', fn: function (m) { return dateTok(nextDow(6, U.today()), m[2]); } },
-    { type: 'date', re: '(다음 ?주|담주|next week)(까지|에)?', fn: function (m) { return dateTok(weekOf(1, 1), m[2]); } },
-    { type: 'date', re: '(다음 ?달|next month)(까지|에)?', fn: function (m) { var t = U.parse(U.today()); return dateTok(U.ymd(new Date(t.getFullYear(), t.getMonth() + 1, 1)), m[2]); } },
+    { type: 'date', re: '(이번 ?주말|주말)(까지|부터|에)?|(this )?weekend', fn: function (m) { return dateTok(nextDow(6, U.today()), m[2]); } },
+    { type: 'date', re: '(by |due )?(다다음 ?주|다음 ?주|담주|next week)(까지|부터|에)?', fn: function (m) { return dateTok(weekOf(/다다음/.test(m[2]) ? 2 : 1, 1), m[1] || m[3]); } },
+    { type: 'date', re: '(다음 ?달|next month)(까지|부터|에)?', fn: function (m) { var t = U.parse(U.today()); return dateTok(U.ymd(new Date(t.getFullYear(), t.getMonth() + 1, 1)), m[2]); } },
     /* "1일 1팩 · 1일 1식 · 1일 2잔"처럼 뒤에 '숫자 + 횟수 · 양 낱말'이 오면 날짜가 아니라 횟수 (3호 7번).
        "15일 3시 미용실 · 5일 10:00"처럼 뒤에 시간이 오는 것은 막지 않는다 (3호 재확인) */
     /* '30일 챌린지' · '3일차' · '5일째' · '3일간' · '7일 동안'은 날짜가 아니라 기간 (5호 9번). '15일 차 정비'(띄어 씀 = 자동차)는 날짜 그대로 */
     /* '부터' = 시작 날(할 날) — "11월 1일부터 5일까지 매일 약" → 1일 시작 · 매일 · 5일에 반복 끝 (사용자 10-31 '언제부터 언제까지') */
-    { type: 'date', re: '(\\d{1,2})일(까지|부터|에)?(?!차|째|간|\\s*(?:챌린지|동안|다이어트|플랭크|금주|금연|습관|완성|프로그램))(?!\\s*\\d+\\s*(?:팩|식|끼|개|번|회|잔|컵|병|알|정|포|장|권|쪽|명|세트|시간|리터|km|키로|kg))', fn: function (m) { var d = dayOnly(+m[1]); return d ? dateTok(d, m[2]) : null; } },
+    { type: 'date', re: '(\\d{1,2})일(까지|부터|에)?(?!차|째|간|\\s*(?:챌린지|동안|다이어트|플랭크|금주|금연|습관|완성|프로그램))(?!\\s*\\d+\\s*(?:팩|식|끼|개|번|회|잔|컵|병|알|정|포|장|권|쪽|명|세트|시간|리터|km|키로|kg))', fn: function (m) { var d = dayOnly(+m[1]); return d ? cyc(dateTok(d, m[2]), cycDay(+m[1])) : null; } },
 
     /* 시간 */
     /* '3시쯤 · 3시경 · 3시 정각'의 꼬리도 시각 조각으로 — 제목에 '쯤'이 남지 않게 (18호 재확인) */
-    { type: 'time', re: '(오전|오후|아침|낮|저녁|밤|새벽)? ?(\\d{1,2})시(?: ?(\\d{1,2})분| ?(반))?(?: ?쯤|경| ?정각)?(?:에|까지)?', fn: function (m) { var h = hour(m[2], m[1]), mi = m[4] ? 30 : +(m[3] || 0); return okTime(h, mi) ? { time: U.hm(h, mi), ampmGuess: !m[1] && guess(+m[2]) } : null; } },   /* 오전 · 오후 없이 7~11시 = 짐작(빠른 추가가 오전이 지났으면 오후로) */
-    { type: 'time', re: '(?:at )?(\\d{1,2})(?::(\\d{2}))? ?(am|pm|a\\.m\\.|p\\.m\\.)', fn: function (m) { var h = hour(m[1], m[3][0].toLowerCase() === 'a' ? 'am' : 'pm'), mi = +(m[2] || 0); return okTime(h, mi) ? { time: U.hm(h, mi) } : null; } },
+    /* '3시부터 · 3시부터 5시까지 · 3시~5시' = 시작 시각 3시 — 끝 시각까지 한 조각으로 읽어 제목에 남지 않게 (36호: '부터'가 없어 뒤의 5시가 잡히던 것) */
+    { type: 'time', re: '(오전|오후|아침|낮|저녁|밤|새벽)? ?(\\d{1,2})시(?: ?(\\d{1,2})분| ?(반))?(?: ?쯤|경| ?정각)?(?:(?:부터| ?~ ?)(?: ?(?:오전|오후|아침|낮|저녁|밤|새벽)? ?(\\d{1,2})시(?: ?\\d{1,2}분| ?반)?(?:까지)?)?|에|까지)?', fn: function (m) {
+      /* '밤 12시' = 그날이 끝나는 때(23:59) — 00:00으로 읽으면 '오늘 밤 12시까지'가 이미 지난 오늘 0시가 되던 것 (구역 4) */
+      if (m[1] === '밤' && +m[2] === 12 && !m[3] && !m[4]) return { time: '23:59' };
+      /* 끝 시각이 시작보다 작으면('9시부터 6시까지 · 11시~1시') 시작은 오전 — 짐작하지 않음 (36호 재확인: 10시 넘어 적으면 밤 9시가 되던 것) */
+      var am = !m[1] && m[5] && +m[5] < +m[2] && +m[2] >= 7 && +m[2] <= 11;   /* 짐작하던 7~11시만 — 1~6시('6시부터 2시까지')는 오전조 · 저녁조 둘 다라 원래 규칙(오후) 그대로 · 12시는 낮 12시 */
+      var h = hour(m[2], am ? '오전' : m[1]), mi = m[4] ? 30 : +(m[3] || 0);
+      return okTime(h, mi) ? { time: U.hm(h, mi), ampmGuess: !m[1] && !am && guess(+m[2]) } : null;
+    } },   /* 오전 · 오후 없이 7~11시 = 짐작(빠른 추가가 오전이 지났으면 오후로) */
+    /* 'by 5pm · at noon'의 by · at도 시각 조각으로 — 제목에 'by'가 남던 것 (구역 4) */
+    { type: 'time', re: '(?:at |by )?(\\d{1,2})(?::(\\d{2}))? ?(am|pm|a\\.m\\.|p\\.m\\.)', fn: function (m) { var h = hour(m[1], m[3][0].toLowerCase() === 'a' ? 'am' : 'pm'), mi = +(m[2] || 0); return okTime(h, mi) ? { time: U.hm(h, mi) } : null; } },
     /* "3:30 치과" = 오후 3시 반 · "8:30 회의" = 짐작 — '3시 · 8시'와 같은 규칙. "03:30 · 08:30"처럼 0을 붙이거나 13시 넘게 적으면 적은 그대로 (4호 3번 · 17호) */
-    { type: 'time', re: '(?:at )?([01]?\\d|2[0-3]):([0-5]\\d)(?:에|까지)?', fn: function (m) { var hh = +m[1], plain = m[1][0] !== '0' && hh <= 12; return { time: U.hm(plain ? hour(hh) : hh, +m[2]), ampmGuess: plain && guess(hh) }; } },
+    { type: 'time', re: '(?:at |by )?([01]?\\d|2[0-3]):([0-5]\\d)(?:에|까지)?', fn: function (m) { var hh = +m[1], plain = m[1][0] !== '0' && hh <= 12; return { time: U.hm(plain ? hour(hh) : hh, +m[2]), ampmGuess: plain && guess(hh) }; } },
     /* 'at 5' = '5시'와 같은 규칙(1~6시 오후 · 7~11시 짐작) — am/pm · ':' 없이 적은 영어 시각 (18호) */
     { type: 'time', re: 'at (\\d{1,2})', fn: function (m) { var hh = +m[1]; return hh >= 1 && hh <= 12 ? { time: U.hm(hour(hh), 0), ampmGuess: guess(hh) } : null; } },
-    { type: 'time', re: '정오|noon', fn: function () { return { time: '12:00' }; } }
+    { type: 'time', re: '(?:at |by )?(?:정오|noon)(?:에|까지)?', fn: function () { return { time: '12:00' }; } },
+    { type: 'time', re: '(?:at |by )?(?:자정|midnight)(?:에|까지)?', fn: function () { return { time: '23:59' }; } }   /* 자정 = 그날 끝(밤 12시와 같은 규칙) */
   ];
 
+  function cyc(tok, c) { if (tok) tok.cyc = c; return tok; }   /* 돌아오는 날짜 조각 표시 — '부터 ~ 까지'를 함께 풀 때 씀 */
   function dateTok(s, word, kind) {
     if (!s) return null;
     var w = (word || '').toLowerCase();
@@ -3076,8 +3313,9 @@ App.parse = (function () {
       .replace(/(^|[^가-힣\d])(\d{1,2}시(?!간)(?: ?\d{1,2}분| ?반)?(?:쯤|경|정각)?(?:에(?!서)|까지)?)(?!(?:으로|이랑|로|는|은|엔|이|가|를|을|와|과|랑|면|의|도|만|께|후)(?=$|\s|[,.!?])|[에까반분쯤경즌]|부터|전에|전까지|정각|리즈|이후|후에)(?=[가-힣])/g, '$1$2 ');
   }
 
-  function run(text, lists, ignore) {
+  function run(text, lists, ignore, opts) {
     ignore = ignore || [];
+    weekStart = opts && opts.weekStart === 1 ? 1 : 0;   /* 설정의 주 시작(기본 일요일 · model.js) */
     text = glue(text);
     var res = { title: text, date: null, time: null, due: null, repeat: null, listId: null, tokens: [] };
     var used = [];
@@ -3099,7 +3337,7 @@ App.parse = (function () {
       apply();
       return true;
     }
-    var got = { repeat: 0, date: 0, due: 0, time: 0 };
+    var got = { repeat: 0, date: 0, due: 0, time: 0 }, dateCyc = null, dueCyc = null;
 
     COMPILED.forEach(function (rule) {
       rule.re.lastIndex = 0;
@@ -3115,13 +3353,22 @@ App.parse = (function () {
         if (got[slot]) continue;
         var ok = take(slot, a, b, null, function () {
           if (r.repeat) { res.repeat = r.repeat; if (r.date && !res.date) res.date = r.date; }
-          if (r.date && !r.repeat) { res.date = r.date; if (r.kind) res.dateKind = r.kind; }
-          if (r.due) { res.due = r.due; if (r.kind) res.dateKind = r.kind; }
+          if (r.date && !r.repeat) { res.date = r.date; if (r.kind) res.dateKind = r.kind; dateCyc = r.cyc || null; }
+          if (r.due) { res.due = r.due; if (r.kind) res.dateKind = r.kind; dueCyc = r.cyc || null; }
           if (r.time) { res.time = r.time; res.ampmGuess = !!r.ampmGuess; }
         });
         if (ok) got[slot] = 1;
       }
     });
+
+    /* '부터 ~ 까지'를 한 기간으로 — 조각마다 따로 '오늘 뒤 가장 가까운 날'로 풀면 시작이 끝보다 뒤가 됨
+       ('11월 1일부터 7일까지'를 11-02에 적으면 시작 2027-11-01 · '28일부터 3일까지'는 끝이 이번 달 3일 · 구역 4).
+       ① 지금 진행 중인 기간(시작은 오늘 전 · 끝은 오늘 뒤)이 있으면 그것 ② 아니면 끝을 시작 뒤 첫날로 */
+    if (res.date && res.due && res.date > res.due) {
+      var sp = dateCyc && !dateCyc.fwd && dateCyc.prev(U.today()), ep = sp && (dueCyc ? dueCyc.next(sp) : res.due);
+      if (sp && ep && ep >= U.today()) { res.date = sp; res.due = ep; }
+      else if (dueCyc) res.due = dueCyc.next(res.date);
+    }
 
     /* 'tonight at 8' = 오늘 저녁 8시 — 짐작 대상(7~11시)은 오후로 정함(아침에 적어도 오전 8시가 되지 않게 · 21호) */
     if (res.time && res.ampmGuess && res.tokens.some(function (tk) { return tk.type === 'date' && /tonight/i.test(tk.text); })) { var th = +res.time.slice(0, 2); if (th < 12) res.time = U.hm(th + 12, +res.time.slice(3)); res.ampmGuess = false; }
@@ -3181,7 +3428,7 @@ App.reminders = (function () {
         var at = sz[key]; if (!(at > now) || at > now + HORIZON_DAYS * 86400000 || T.isDone(task, key)) return;
         if (task.repeat && !Q.liveOcc(task, key)) return;   /* 건너뛴 회차 · 규칙을 바꿔 없어진 회차 · 반복을 끝낸 날 뒤로 옮겨 둔 회차의 미룬 알림은 울리지 않음 (25호) */
         var day = key === 'once' ? (task.date || task.due || U.ymd(new Date(at))) : ((task.moved || {})[key] || key);   /* 이번만 옮긴 회차는 옮긴 날 */
-        out.push({ id: task.id + '|' + key + '|z', taskId: task.id, key: key, at: at, title: task.title, body: body(task, day, at) });
+        out.push({ id: task.id + '|' + key + '|z', taskId: task.id, key: key, at: at, title: task.title, body: body(task, day, at), late: lateBody(task, day) });
       });
       var alerts = Array.isArray(task.alerts) ? task.alerts : [];
       if (!alerts.length) return;
@@ -3197,8 +3444,9 @@ App.reminders = (function () {
         if (T.isDone(task, key)) return;
         alerts.forEach(function (a, i) {
           var at = alertAt(task, day, a);
-          if (at == null || at <= now || at > now + HORIZON_DAYS * 86400000) return;
-          out.push({ id: task.id + '|' + key + '|' + i, taskId: task.id, key: key, at: at, title: task.title, body: body(task, day, at) });
+          if (at == null || at <= now) return;
+          if (at > now + HORIZON_DAYS * 86400000) { cut = true; return; }   /* 60일보다 먼 알림(한 번짜리 포함)이 빠지면 끊긴 것 — '앱을 열어 주세요'를 넣음. 한 번짜리는 소리 없이 빠지던 것 (구역 6) */
+          out.push({ id: task.id + '|' + key + '|' + i, taskId: task.id, key: key, at: at, title: task.title, body: body(task, day, at), late: lateBody(task, day) });
           if (task.repeat && at > repLast) repLast = at;
         });
       });
@@ -3231,7 +3479,7 @@ App.reminders = (function () {
         alerts.forEach(function (a, i) {
           var at = alertAt(task, it.day, a);
           if (at == null || at <= now || at > now + HORIZON_DAYS * 86400000) return;
-          out.push({ id: task.id + '|' + it.key + '|' + i, taskId: task.id, key: it.key, at: at, title: task.title, body: body(task, it.day, at) });
+          out.push({ id: task.id + '|' + it.key + '|' + i, taskId: task.id, key: it.key, at: at, title: task.title, body: body(task, it.day, at), late: lateBody(task, it.day) });
         });
       });
     });
@@ -3252,6 +3500,14 @@ App.reminders = (function () {
     if (gap === 0) return due ? t('notif.dueToday') : t('notif.today');
     if (gap === 1) return due ? t('notif.dueTomorrow') : t('notif.tomorrow');
     return due ? t('notif.dueOn', { date: I.dateNoWeek(day) }) : t('notif.on', { date: I.dateNoWeek(day) });
+  }
+
+  /* 늦게 뜰 때 쓰는 글(날짜를 박은 것) — 안드로이드가 '10분 뒤' · 꺼져 있다 켠 뒤 같은 알림을 다시 띄울 땐 그때의 '오늘 · 내일'이 달라질 수 있어서
+     (자정 넘어 'Today at 11:55 PM'이 어제 일을 가리키던 것 · 38호). 규칙은 여기 한 곳 · 기기 쪽은 고르기만 */
+  function lateBody(task, day) {
+    var t = App.i18n.t, I = App.i18n;
+    if (task.time) return t('notif.dateAt', { date: I.dateNoWeek(day), time: I.time(task.time) });
+    return !task.date && task.due ? t('notif.dueOn', { date: I.dateNoWeek(day) }) : t('notif.on', { date: I.dateNoWeek(day) });
   }
 
   /* 고르기 창의 칸 — 시간 있음: 정시 · 10분 · 30분 · 1시간 · 하루 전 / 시간 없음: 그날 · 전날 (시각은 사람이 바꿈 · 기본 오전 9시) */
@@ -3468,6 +3724,8 @@ App.platformWeb = function () {
   function set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { App.bus.emit('storage-error', e); return false; } }
 
   function show(r) {
+    /* 늦게 울린 타이머(컴퓨터가 잠든 사이 밀림)는 날짜를 박은 글 — 안드로이드 늦은 알림과 같은 규칙(구역 6) */
+    if (r.late && App.util.now() - r.at > 5 * 60000) r = Object.assign({}, r, { body: r.late });
     App.bus.emit('reminder', r);  /* 화면이 보이면 앱 안에서도 알려 준다 */
     if (!('Notification' in window) || Notification.permission !== 'granted' || !document.hidden) return;
     /* 단추 = 안드로이드 알림과 같은 '10분 뒤' · '확인' — 누르면 sw.js가 열린 앱에 알려 같은 규칙(App.snoozeTask)으로 (사용자 11-01) */
@@ -3605,7 +3863,7 @@ App.platformAndroid = function (A) {
         if (!has('scheduleAlarms')) return;
         /* local = 울릴 '벽시계' 시각(이 기기 시간대). 해외에서 시간대가 바뀌면 자바가 이것으로 다시 셈 — 서울 9시 알림이 파리 새벽에 울리지 않게 (새 눈 5호 4번) */
         var U = App.util;
-        var json = JSON.stringify(list.map(function (r) { var dd = new Date(r.at); return { id: r.id, taskId: r.taskId, key: r.key, at: r.at, local: U.ymd(dd) + 'T' + U.hm(dd.getHours(), dd.getMinutes()), title: r.title, body: r.body }; }));
+        var json = JSON.stringify(list.map(function (r) { var dd = new Date(r.at); return { id: r.id, taskId: r.taskId, key: r.key, at: r.at, local: U.ymd(dd) + 'T' + U.hm(dd.getHours(), dd.getMinutes()), title: r.title, body: r.body, late: r.late }; }));
         /* 지난번에 넘긴 목록과 같으면 다시 걸지 않음 — 제목 · 설정만 바꿔도 알람 80개를 취소 · 다시 걸며 화면을 막던 것 (새 눈 11호 3번). 켤 때 첫 번은 늘 넘김 */
         if (json !== lastAlarms) { lastAlarms = json; A.scheduleAlarms(json); }
         /* 앱에서 끝내거나 지운 일의 알림이 알림 칸에 남아 있으면 거둠 — 이름표 't|할 일|회차'는 AlarmReceiver.tagOf와 짝 (4호 마지막 확인) */
@@ -3631,7 +3889,7 @@ App.platformAndroid = function (A) {
       /* 끝낸 회차의 알림 칸(울리지 않음 · 기기는 보관만) — 앱이 꺼진 채 위젯에서 체크를 풀면 기기가 이것으로 되살림. 같으면 다시 안 넘김 */
       keepDormant: function (list) {
         if (!has('keepDormant')) return;
-        var U = App.util, json = JSON.stringify(list.map(function (r) { var dd = new Date(r.at); return { id: r.id, taskId: r.taskId, key: r.key, at: r.at, local: U.ymd(dd) + 'T' + U.hm(dd.getHours(), dd.getMinutes()), title: r.title, body: r.body }; }));
+        var U = App.util, json = JSON.stringify(list.map(function (r) { var dd = new Date(r.at); return { id: r.id, taskId: r.taskId, key: r.key, at: r.at, local: U.ymd(dd) + 'T' + U.hm(dd.getHours(), dd.getMinutes()), title: r.title, body: r.body, late: r.late }; }));
         if (json !== lastDormant) { lastDormant = json; A.keepDormant(json); }
       }
     },
@@ -3867,7 +4125,7 @@ App.store = (function () {
     var prevUndo = { snap: undoSnap, seq: undoSeq }; newUndo(before);
     var keepLook = data.settings, lock = data.settings.trialPin;
     data = M.empty();
-    if (fill) { fill(data); ['theme', 'accent', 'accentVivid', 'textSize', 'weekStart', 'haptic', 'seenNews', 'lang', 'markStyle'].forEach(function (k) { if (keepLook[k] !== undefined) data.settings[k] = keepLook[k]; }); }   /* 예시로 바꿔도 화면 색 · 글자 크기는 지금 그대로 */
+    if (fill) { fill(data); DEVICE_KEYS.concat('weekStart').forEach(function (k) { if (k !== 'onboarded' && k !== 'trialPin' && keepLook[k] !== undefined) data.settings[k] = keepLook[k]; }); }   /* 예시로 바꿔도 이 기기 설정(화면 색 · 글자 크기 · 닫은 안내 · 마지막 내보낸 날 …)은 지금 그대로 — 불러오기와 같은 칸 (37호) */
     if (lock) data.settings.trialPin = lock;   /* 잠금은 기기 보호 — 처음 상태로 해도 그대로 */
     data.meta.trial = kind || (fill ? 'sample' : 'fresh');   /* 시험판 상태 표시 → 설정에 '시험 전 기록으로 돌아가기' */
     data.settings.keepBackupUntil = U.now() + KEEP_DAYS * 86400000;
@@ -3999,7 +4257,9 @@ App.icons = (function () {
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
     lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
     star: '<path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9-4.4-4.1 6-.8z" fill="currentColor" stroke="currentColor" stroke-width="1.2"/>',   /* 중요 표시 '별' 안 (11-01) */
-    sparkle: '<path d="M12 3.5l1.8 5 5 1.8-5 1.8-1.8 5-1.8-5-5-1.8 5-1.8z"/>'
+    sparkle: '<path d="M12 3.5l1.8 5 5 1.8-5 1.8-1.8 5-1.8-5-5-1.8 5-1.8z"/>',
+    copy: '<rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.5"/><path d="M15.5 8.5V6.5A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/>',   /* 다른 날에 복사 (11-16) */
+    sliders:'<path d="M4 7.5h8.5M17.5 7.5H20M4 16.5h2.5M11.5 16.5H20"/><circle cx="15" cy="7.5" r="2.5"/><circle cx="9" cy="16.5" r="2.5"/>'   /* 설정 › 일반 (11-14) */
   };
   function svg(name, size) {
     var s = size || 22;
@@ -4106,7 +4366,7 @@ App.sheet = (function () {
 
     var openedAt = Date.now();
     scrim.addEventListener('click', function () { if (Date.now() - openedAt < 350) return; close(); });   /* 여는 누름의 두 번째 톡(두 번 누름)이 막 생긴 어둠막에 떨어져 연 창이 바로 닫히던 것 — 여는 동안(0.35초)은 무시 (새 눈 10호 4번) */
-    dragToClose(el, grip, head, body, close);
+    dragToClose(el, grip, head, body, close, scrim);
 
     if (typeof o.content === 'function') o.content(body, api); else if (o.content) body.appendChild(o.content);
     scrim.style.zIndex = 40 + stack.length * 2;      /* 창 위에 창: 새 어둠막이 아래 창을 덮는다 */
@@ -4129,18 +4389,31 @@ App.sheet = (function () {
      닫힘 = 끈 거리가 창 높이의 1/4(최소 90px)을 넘거나, 아래로 빠르게 튕김(0.5px/ms · 24px 넘게). 덜 끌고 놓으면 제자리로 돌아감 */
   var OWN_GESTURE = 'input,textarea,select,[contenteditable],.wheel-col,.crop-stage,.size-range';
   function busyHere(tg) { var de = document.documentElement; return de.classList.contains('is-reordering') || de.classList.contains('is-holding') || !!(tg && tg.closest && tg.closest('.is-lifted,.is-dragging')); }   /* 꾹 눌러 들린 줄(순서 · 휴지통)이 손을 가졌으면 창은 가만히 */
-  function dragToClose(el, grip, head, body, close) {
-    var dy = 0, on = false, tr = App.motion.tracker();
-    function narrow() { return !window.matchMedia('(min-width: 768px) and (min-height: 560px)').matches; }
+  function dragToClose(el, grip, head, body, close, scrim) {
+    var dy = 0, on = false, going = null, tr = App.motion.tracker();
+    function narrow() { return !going && !window.matchMedia('(min-width: 768px) and (min-height: 560px)').matches; }   /* 놓은 뒤 마저 가는 동안(0.2~0.4초)은 새로 잡지 않음 */
     function begin(y, t) { on = true; dy = 0; tr.reset(); tr.add(y, t); el.classList.add('is-dragging'); }
     /* (v0.1.56의 '끌기 12px에 키보드 먼저 내리기'는 뺌 — 안드로이드에서 창이 손가락 밑에서 키보드만큼 툭 떨어졌다 튀어 오름(12호 2번).
        '+ 두 번'의 진짜 원인은 탭 줄 새로 만들기였고 고쳤음 · 탭 줄도 키보드 동안 제자리) */
     function follow(d, y, t) { dy = Math.max(0, d); el.style.transform = 'translateY(' + dy + 'px)'; tr.add(y, t); }
     /* 속도 = 최근 80ms(멈췄다 떼면 0) — 마지막 두 점만 보면 멈췄다 떼도 '튕김'으로 닫히던 것 (4차 6) */
+    /* 11-14: 놓은 뒤에는 손가락 속도를 이어받아 마저 감(motion.settle · 캘린더 끌기와 같은 방식).
+       예전엔 놓는 순간 늘 0.3초짜리 한 가지 움직임으로 바뀌어, 빠르게 튕겨도 천천히 내려도 똑같이 '휙' 닫히고 덜 끌었을 땐 '툭' 돌아왔음 */
     function finish(cancel, t) {
-      if (!on) return; on = false; el.classList.remove('is-dragging'); el.style.transform = '';
-      var v = tr.velocity(t || performance.now());
-      if (!cancel && (dy > Math.max(90, el.offsetHeight / 4) || (dy > 24 && v > 0.5))) close();
+      if (!on) return; on = false;
+      var v = tr.velocity(t || performance.now()), H = el.offsetHeight;
+      var shut = !cancel && (dy > Math.max(90, H / 4) || (dy > 24 && v > 0.5));
+      if (dy <= 0) { el.classList.remove('is-dragging'); el.style.transform = ''; return; }
+      if (shut && scrim) scrim.classList.remove('is-open');   /* 어둠막은 놓는 순간부터 걷힘 */
+      var y0 = dy, y1 = shut ? H + 24 : 0;
+      /* settle은 0 → 1 사이 값과 그 구간의 px(거리)를 받음 — 속도가 없으면 --m-settle, 있으면 그 속도에 맞춘 시간 */
+      going = App.motion.settle({ from: 0, to: 1, px: Math.abs(y1 - y0), velocity: shut ? Math.max(0, v) : Math.max(0, -v),
+        onFrame: function (f) { el.style.transform = 'translateY(' + (y0 + (y1 - y0) * f) + 'px)'; },
+        onEnd: function () {
+          going = null; el.classList.remove('is-dragging');
+          if (shut) close();   /* 다 내려간 자리 그대로 닫음(다시 움직이지 않게 transform은 둠) */
+          else el.style.transform = '';
+        } });
     }
     /* ① 손잡이 · 머리 */
     var y0 = null;
@@ -4331,7 +4604,7 @@ App.pickers = (function () {
       body.appendChild(h('div.chips.pick-chips', quick.map(function (q) {
         var on = q[1] === sel.start && (q[2] || null) === (sel.end || null);
         return h('button.chip' + (on ? '.is-on' : ''), { type: 'button', onclick: function () { close(q[1], q[2] || null); } }, q[0],
-          h('span.chip-sub', q[2] ? I.dateNoWeek(q[1]) + '~' + (U.parse(q[2]).getMonth() === U.parse(q[1]).getMonth() ? t('pick.dayOnly', { d: U.parse(q[2]).getDate() }) : I.dateNoWeek(q[2])) : I.dateNoWeek(q[1])));
+          h('span.chip-sub', q[2] ? t('pick.rangeChip', { from: I.dateNoWeek(q[1]), to: U.parse(q[2]).getMonth() === U.parse(q[1]).getMonth() ? t('pick.dayOnly', { d: U.parse(q[2]).getDate() }) : I.dateNoWeek(q[2]) }) : I.dateNoWeek(q[1])));   /* 언어의 기간 표기(ko '~' · en '–') — 38호 */
       })));
       body.appendChild(monthGrid(state, sel, tap, { disabled: o.disabled }));
       var none = (o.value || o.end) && o.allowNone !== false ? h('button.btn.soft', { type: 'button', onclick: function () { close(null, null); } }, t('pick.none')) : null;
@@ -4380,15 +4653,15 @@ App.pickers = (function () {
   /* 휠 — 오전/오후 · 시(1~12) · 분(5분 단위). 칸마다 스크롤 스냅(가운데 띠가 고른 값) · 칸을 눌러도 그 값으로 · 위아래 화살표 키.
      저장된 값이 5분 단위가 아니면(글로 '3시 7분') 그 분을 끼워 넣어 그대로 보임 */
   var ROW = 40;
-  function wheel(hhmm) {
+  function wheel(hhmm, onChange) {   /* onChange = 사람이 돌리거나 눌러 값이 바뀔 때마다(아이폰 시간 칸의 input과 같은 자리 · 37호) */
     var p = hhmm.split(':'), H = +p[0], Mi = +p[1];
     var parts = I.timeParts('13:00'), am = I.timeParts('09:00').period || 'AM', pm = parts.period || 'PM';
     var mins = []; for (var m = 0; m < 60; m += 5) mins.push(m); if (mins.indexOf(Mi) < 0) { mins.push(Mi); mins.sort(function (a, b) { return a - b; }); }
     var hours = []; for (var x = 1; x <= 12; x++) hours.push(x);
     var cols = [
-      col([am, pm], H >= 12 ? 1 : 0, t('wheel.period'), function (v) { return v; }),
-      col(hours, hours.indexOf(H % 12 === 0 ? 12 : H % 12), t('wheel.hour'), function (v) { return String(v); }),
-      col(mins, mins.indexOf(Mi), t('wheel.minute'), function (v) { return U.pad(v); })
+      col([am, pm], H >= 12 ? 1 : 0, t('wheel.period'), function (v) { return v; }, onChange),
+      col(hours, hours.indexOf(H % 12 === 0 ? 12 : H % 12), t('wheel.hour'), function (v) { return String(v); }, onChange),
+      col(mins, mins.indexOf(Mi), t('wheel.minute'), function (v) { return U.pad(v); }, onChange)
     ];
     /* 한국어는 '오전 9:05' 차례, 영어는 '9:05 AM' — 기기 말 차례를 따름 */
     var periodFirst = /^\D/.test(I.time('09:00'));
@@ -4399,25 +4672,27 @@ App.pickers = (function () {
     }
     return { el: el, value: value };
   }
-  function col(items, start, label, show) {
+  function col(items, start, label, show, onChange) {
     var list = h('div.wheel-list', items.map(function (v, i) { return h('div.wheel-item', { 'data-i': String(i), onclick: function () { go(i, true); } }, show(v)); }));
     var box = h('div.wheel-col', { role: 'spinbutton', tabindex: 0, 'aria-label': label, 'aria-valuemin': '0', 'aria-valuemax': String(items.length - 1) }, list);
-    var cur = Math.max(0, start);
+    var cur = Math.max(0, start), aimed = true;   /* aimed = 칸을 눌러(또는 키로 · 처음 자리) 고른 값이 cur — 굴러가는 0.3초 사이 scrollTop은 중간 값이라 읽지 않음 (구역 3) */
+    ['pointerdown', 'wheel', 'touchstart'].forEach(function (ev) { box.addEventListener(ev, function () { aimed = false; }, { passive: true }); });   /* 손으로 돌리기 시작하면 scrollTop이 값 */
     function go(i, smooth) {
-      cur = Math.max(0, Math.min(items.length - 1, i));
+      var was = cur; cur = Math.max(0, Math.min(items.length - 1, i)); aimed = true;
       try { box.scrollTo({ top: cur * ROW, behavior: smooth ? 'smooth' : 'auto' }); } catch (e) { box.scrollTop = cur * ROW; }
-      paint();
+      paint(); if (cur !== was && onChange) onChange();
     }
     function paint() {
       box.setAttribute('aria-valuenow', String(cur)); box.setAttribute('aria-valuetext', show(items[cur]));
       Array.prototype.forEach.call(list.children, function (c, i) { c.classList.toggle('is-on', i === cur); });
     }
-    var settle = U.debounce(function () { var i = Math.round(box.scrollTop / ROW); if (i !== cur) { cur = Math.max(0, Math.min(items.length - 1, i)); paint(); App.platform.haptic.tap(); } }, 70);
+    /* 화면에서 떨어진 휠(칩을 눌러 창을 다시 그림)은 늦게 울려도 아무것도 안 함 — 굴러가던 옛 휠이 새 칩 고름을 지우던 것 (37호 재확인) */
+    var settle = U.debounce(function () { if (!box.isConnected || aimed) return; var i = Math.round(box.scrollTop / ROW); if (i !== cur) { cur = Math.max(0, Math.min(items.length - 1, i)); paint(); App.platform.haptic.tap(); if (onChange) onChange(); } }, 70);
     box.addEventListener('scroll', settle, { passive: true });
     box.addEventListener('keydown', function (e) { if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); go(cur + (e.key === 'ArrowUp' ? -1 : 1), true); } });
     requestAnimationFrame(function () { go(cur, false); });   /* 창에 붙은 뒤에 자리 잡기 */
     paint();
-    return { el: box, index: function () { return Math.max(0, Math.min(items.length - 1, Math.round(box.scrollTop / ROW))); } };
+    return { el: box, index: function () { return aimed ? cur : Math.max(0, Math.min(items.length - 1, Math.round(box.scrollTop / ROW))); } };
   }
 
   /* ── 알림 (사용자 11-01 '그날 · 전날 하드코딩 · 오전 9시를 눌러 고칠 수 있는지 안 보임 · 체크의 뜻을 하나하나 파악해야 함 → 일반 알림 설정처럼 날짜 · 시각을 고르고 확인' →
@@ -4473,8 +4748,9 @@ App.pickers = (function () {
     var init = chipSel != null ? R.pickOf(task, { before: chipSel }) : o.value ? R.pickOf(task, o.value) : null;
     var dateV = init ? init.date : base, timeV = init ? init.time : (o.lastAt || R.DEFAULT_AT), calOpen = false, getTime = null, msg = '';
     if (!init && dateV === today && !task.repeat) { var nw = new Date(U.now()), nm = Math.ceil((nw.getHours() * 60 + nw.getMinutes() + 1) / 5) * 5; if (nm < 1440 && U.toMin(timeV) <= nw.getHours() * 60 + nw.getMinutes()) timeV = U.hm(Math.floor(nm / 60), nm % 60); }   /* 오늘이면 지난 시각으로 열지 않음 */
+    /* 지난 한 번짜리 일 — 알림을 정할 수 없는 까닭을 먼저 (검토 2). 창을 열기 전에 셈 — open이 바로 그리므로 뒤에 두면 첫 그림에 안내가 빠지던 것 (구역 3) */
+    var taskPast = !task.repeat && base && base < today;
     var s = App.sheet.open({ title: o.value ? t('remind.edit') : t('remind.title'), content: function (body) { draw(body); } });
-    var taskPast = !task.repeat && base && base < today;   /* 지난 한 번짜리 일 — 알림을 정할 수 없는 까닭을 먼저 (검토 2) */
     function draw(body) {
       if (getTime) timeV = getTime() || timeV;   /* 다시 그려도 손댄 시각은 그대로 */
       App.dom.clear(body);
@@ -4498,9 +4774,10 @@ App.pickers = (function () {
         body.appendChild(monthGrid(st0, { start: dateV }, function (d) { dateV = d; calOpen = false; chipSel = null; msg = ''; draw(body); }, { disabled: function (x) { return (base && x > base) || (!task.repeat && x < today); } }));
       }
       body.appendChild(h('label.pick-label', { text: t('remind.timeRow') }));
-      if (ANDROID) { var w = wheel(timeV); body.appendChild(w.el); getTime = w.value; }
+      if (ANDROID) { var w = wheel(timeV, clearChip); body.appendChild(w.el); getTime = w.value; }
       else { var input = h('input.field.time-input', { type: 'time', value: timeV, step: 300, 'aria-label': t('remind.timeRow') }); body.appendChild(input); getTime = function () { return input.value; };
-        input.addEventListener('input', function () { msg = ''; note.textContent = ''; if (chipSel != null) { chipSel = null; paintChips(); } }); }   /* 시각을 손으로 바꾸면 칩은 꺼짐 (검토 3) */
+        input.addEventListener('input', clearChip); }
+      function clearChip() { msg = ''; note.textContent = ''; if (chipSel != null) { chipSel = null; paintChips(); } }   /* 시각을 손으로 바꾸면 칩은 꺼짐 (검토 3) */
       var note = h('p.prop-note.alert-msg', { role: 'status', text: msg || (taskPast ? t('remind.taskPast') : '') });
       body.appendChild(note);
       if (App.platform.notify.kind === 'foreground') body.appendChild(h('p.prop-note', { text: t('notify.foregroundNote') }));
@@ -4713,9 +4990,10 @@ App.pickers = (function () {
   function list(o) {
     var d = App.store.data;
     var s = App.sheet.open({ title: t('prop.list'), content: function (body) {
-      body.appendChild(opt(t('list.none'), null, !o.value, function () { s.close(true); o.onPick(null); }, h('span.list-dot.c-none')));
+      /* 줄 앞 표시는 모두 같은 칸(.prop-icon)에 — 색 점 · 이모지 · 사진 · 아래 '새 목록' + 가 같은 세로줄 (11-16) */
+      body.appendChild(opt(t('list.none'), null, !o.value, function () { s.close(true); o.onPick(null); }, h('span.prop-icon', h('span.list-dot.c-none'))));
       d.lists.filter(App.tasks.alive).sort(function (a, b) { return a.order - b.order; }).forEach(function (l) {   /* 목록 탭의 순서 그대로 (6호 4번) */
-        body.appendChild(opt(l.name, null, l.id === o.value, function () { s.close(true); o.onPick(l.id); }, App.listMark(l)));
+        body.appendChild(opt(l.name, null, l.id === o.value, function () { s.close(true); o.onPick(l.id); }, h('span.prop-icon', App.listMark(l))));
       });
       body.appendChild(h('button.opt.opt-add', { type: 'button', onclick: function () {
         s.close(true);
@@ -4723,7 +5001,7 @@ App.pickers = (function () {
           var l = App.store.commit(function (dd) { return App.tasks.addList(dd, name); });
           o.onPick(l.id);
         } });
-      } }, h('span', { html: ic('plus', 20) }), h('span.opt-label', t('list.new'))));
+      } }, h('span.prop-icon', { html: ic('plus', 20) }), h('span.opt-label', t('list.new'))));
     } });
   }
 
@@ -4848,7 +5126,8 @@ App.reorder = (function () {
   }
 
   function groupOf(card) { return card ? Array.prototype.filter.call(card.children, function (c) { return c.hasAttribute('data-drag'); }) : []; }
-  function idsOf(g) { return g.map(function (w) { return w.getAttribute('data-drag'); }); }
+  /* 카드가 접어 둔 뒤쪽 줄(data-rest)도 차례 끝에 붙여 넘김 — 놓은 자리의 이웃을 접힌 줄까지 보고 정하게 (구역 1). 보이는 줄의 자리 번호는 그대로 */
+  function idsOf(g) { var ids = g.map(function (w) { return w.getAttribute('data-drag'); }), card = g.length && g[0].parentNode, rest = card && card.getAttribute && card.getAttribute('data-rest'); return rest ? ids.concat(rest.split(' ')) : ids; }
 
   function bind(el, wrap, o) {
     var timer = null, x0 = 0, y0 = 0, lifted = false, touching = false, mouse = false, pid = null, free = false, armed = false;
@@ -5139,7 +5418,37 @@ App.motion = (function () {
     return { takeMoved: function () { var m = lastMoved; lastMoved = false; return m; } };
   }
 
-  return { tracker: tracker, settle: settle, drag: drag, rubber: rubber, reduced: reduced, token: function (k) { return tokens()[k]; } };
+  /* ── 펼치고 접을 때 '아래 것들'이 뚝 밀리지 않고 미끄러지게 (11-14) ──
+     묶음을 펼치면(지난 일 · 세부 할 일) 그 아래 줄 · 묶음이 한 번에 새 자리로 튀었다. 높이를 프레임마다 다시 재는 대신(레이아웃 비용),
+     바뀌기 전 자리와 뒤 자리를 한 번씩만 재서 그 차이만큼 transform으로 옮겨 놓고 0으로 풀어 준다(그래픽 칩이 맡는 움직임 · row.js flip과 같은 방식).
+     below(el) = el 뒤에 놓이는 것들: el의 다음 형제들 + 조상마다 그 다음 형제들(화면 · 창 안 스크롤 칸까지).
+     slide(before, after) = 자리 표(before)와 지금 요소들(after)을 차례대로 견줘 움직인 것만. 다시 그려 요소가 새로 만들어진 경우에도 차례가 같으면 쓸 수 있다 */
+  function below(el) {
+    var out = [];
+    for (var n = el; n && n.id !== 'main' && !(n.classList && (n.classList.contains('sheet-body') || n.classList.contains('screen'))); n = n.parentElement)
+      for (var s = n.nextElementSibling; s; s = s.nextElementSibling) out.push(s);
+    return out;
+  }
+  function tops(list) { return list.map(function (n) { return n.getBoundingClientRect().top; }); }
+  function slide(before, after) {
+    if (reduced()) return;
+    var moved = [], far = 0;
+    after.forEach(function (n, i) {
+      if (before[i] == null) return;
+      var dy = before[i] - n.getBoundingClientRect().top;
+      if (Math.abs(dy) > 1 && Math.abs(dy) < 2000) { n.style.transition = 'none'; n.style.transform = 'translateY(' + dy + 'px)'; moved.push(n); far = Math.max(far, Math.abs(dy)); }
+    });
+    if (!moved.length) return;
+    void moved[0].offsetHeight;
+    /* 멀리 가는 만큼 조금 더 길게(0.22 ~ 0.42초) — 줄 서너 개가 펼쳐질 때와 스무 줄이 펼쳐질 때가 같은 0.26초면 긴 쪽이 '휙' 지나감 */
+    var ms = Math.round(Math.min(420, 200 + far * 0.3));
+    moved.forEach(function (n) { n.style.transition = 'transform ' + ms + 'ms var(--ease)'; n.style.transform = ''; });
+    setTimeout(function () { moved.forEach(function (n) { n.style.transition = ''; }); }, ms + 40);
+  }
+  /* 같은 요소가 그대로 남는 바꾸기(펼침 표시만 바꿈)용 — el 아래 것들이 미끄러짐 */
+  function reflow(el, change) { var list = below(el), was = tops(list); change(); slide(was, list); }
+
+  return { tracker: tracker, settle: settle, drag: drag, rubber: rubber, reduced: reduced, token: function (k) { return tokens()[k]; }, below: below, tops: tops, slide: slide, reflow: reflow };
 })();
 
 </script>
@@ -5207,7 +5516,7 @@ App.row = (function () {
   function rangeLabel(a, b) {
     var pa = U.parse(a), pb = U.parse(b);
     if (pa.getFullYear() === pb.getFullYear() && pa.getMonth() === pb.getMonth()) return t('span.rangeSame', { from: I.dateNoWeek(a), to: pb.getDate() });
-    return I.dateNoWeek(a) + '~' + I.dateNoWeek(b);
+    return t('pick.rangeChip', { from: I.dateNoWeek(a), to: I.dateNoWeek(b) });   /* 달이 바뀌어도 언어의 기간 표기(ko '~' · en '–') — 38호 */
   }
   function meta(it, o) {
     var task = it.task, out = [], d = S.data;
@@ -5216,7 +5525,7 @@ App.row = (function () {
     else if (o.late && task.repeat) out.push(h('span.meta.is-late', I.relDay(it.day)));   /* 못 한 반복 회차 = 그 회차 날(시작한 날이 아니라) */
     /* 이번만 옮긴 회차: 옮긴 줄 한 곳에만 · 끝내기 전까지만 작은 글자 — 수요일 줄에 '매주 화요일'만 있으면 고장처럼 읽힘 (22호 · 원래 날엔 흔적 없음) */
     if (it.movedFrom && !T.isDone(task, it.key)) out.push(h('span.meta', t('move.from', { date: I.dateNoWeek(it.movedFrom) })));
-    else if (o.late && task.date) out.push(h('span.meta.is-late', I.relDay(task.date)));
+    else if (o.late && task.date && !task.repeat) out.push(h('span.meta.is-late', I.relDay(task.date)));   /* 반복은 위에서 회차 날을 이미 붙임 — 시작 날이 한 번 더 붙던 것 (33호) */
     /* 한 줄 차례(미감 점검원 8호 · 미리 알림 · Things 방식): 가장 자주 훑는 시간 → 언제까지 → 기간 n일째 → 목록 → 반복 → 세부 · 메모.
        '중요'는 글자 대신 제목 끝 깃발 아이콘 하나(render) — 빨간 글자가 맨 앞에서 소리치지 않게 */
     if (task.time && !o.timeCol) out.push(h('span.meta', { html: ic('clock', 13) }, I.time(task.time)));   /* 일정 묶음은 줄 왼쪽 시각 열이 말함 (하나의 개념 = 하나의 표현) */
@@ -5225,7 +5534,7 @@ App.row = (function () {
     if (task.due && !(task.date === task.due) && !(!it.ended && App.query.spanAt(task, it.day))) out.push(dueBadge(task.due));   /* 기간 표시('3일~7일 · 3일째')가 끝날 날을 이미 말하면 '7일까지'는 빼고 */
     /* 끝나는 날이 정해진 반복: '11월 10일까지' (6호 1번) */
     /* 반복 끝나는 날은 '반복 · ○까지' — 언제까지(한 번 하는 일)와 같은 배지로 보이던 것 (일관성 점검원 · 빠른 추가 칩과 같은 표현) */
-    if (task.repeat && task.repeat.until && !App.repeat.isEnded(task.repeat) && !it.ended) out.push(h('span.badge', t('prop.repeat') + ' · ' + t('due.until', { date: I.dateNoWeek(task.repeat.until) })));
+    if (task.repeat && task.repeat.until && !App.repeat.isEnded(task.repeat) && !it.ended && !App.query.spanAt(task, it.day)) out.push(   /* 기간 표시('11월 2일~10일 · n일째')가 끝나는 날을 이미 말하면 빼고 — 언제까지 배지와 같은 규칙 (33호) */h('span.badge', t('rep.until', { date: I.dateNoWeek(task.repeat.until) })));   /* en 'Due …'로 마감처럼 읽히던 것 — 반복 끝나는 날 전용 말 (38호) */
     /* 기간 안의 날이면 'n일째 / 전체 n일' — '부터 ~까지'가 하루하루 이어진다는 게 보이게 (사용자 10-31 '캘린더에서 이어지는 느낌이 아예 없음').
        기간 안에 한 번 하는 일(할 날 + 언제까지)은 둘째 날부터, 기간 동안 매일 하는 일(매일 반복 + 끝나는 날)은 첫날부터 */
     /* 11-01: 'n일째' 앞에 '11월 3일~7일'을 붙여 시작일이 줄에서 바로 보이게 (사용자 '며칠부터였지?' · 작은 달력은 점 · 깃발만 그대로) */
@@ -5233,20 +5542,30 @@ App.row = (function () {
     if (sp) out.push(h('span.meta.span-meta', whole ? t('span.progressRange', { range: rangeLabel(whole.start, whole.end), n: sp.n }) : t('span.progress', sp)));
     if (task.listId && !o.hideList) {
       var l = T.list(d, task.listId);
-      if (l) out.push(h('span.meta', l.photo || l.emoji ? App.listMark(l, '.sm') : h('span.dot.bg-' + l.color), l.name));
+      if (l) out.push(h('span.meta', l.photo || l.emoji ? App.listMark(l, '.sm') : h('span.dot.bg-' + l.color), h('span.meta-text', l.name)));   /* 글을 칸에 담아야 '…'이 걸림(flex 안 맨글은 말줄임이 안 먹어 글자 중간에서 뚝 잘리던 것 · 구역 1) */
     }
     if (task.repeat) {
       /* '반복' 묶음 안에서는 '매일'을 적지 않는다 — 묶음 이름이 이미 말해 줌, 8번 되풀이되면 시끄러움. 매주 화목 · 3일마다처럼 정보가 되는 것만 (디자인 조수 5차 · 2호 2번) */
       var desc = App.repeat.describe(task.repeat, task.date);
       if (o.inRepeat && desc === t('rep.daily')) { /* 묶음 이름이 이미 말함 */ }
       else if (o.dayView && desc === t('rep.daily')) out.push(h('span.meta', { html: ic('repeat', 13), role: 'img', 'aria-label': desc, title: desc }));   /* 하루 흐름 속 매일 반복은 아이콘만 */
-      else out.push(h('span.meta', { html: ic('repeat', 13), 'aria-label': t('prop.repeat') }, desc));
+      else out.push(h('span.meta', { html: ic('repeat', 13), 'aria-label': t('prop.repeat') }, h('span.meta-text', desc)));
     }
     if (task.subtasks.length) out.push(h('span.meta', t('row.subCount', { done: T.subDoneCount(task, it.key), total: task.subtasks.length })));
     if (task.note) out.push(h('span.meta', { html: ic('note', 13), role: 'img', 'aria-label': t('prop.note') }));
     /* 둘째 줄에 아이콘 하나뿐(매일 반복 표시 · 종)이면 그 줄을 만들지 않고 제목 끝에 붙임 — 정보는 그대로, 빈 줄처럼 보이던 높이만 뺌 (새 눈 점검원 1 · 2호) */
     if (out.length && out.every(function (x) { return !x.textContent.trim(); })) return { inline: out };
     return out.length ? h('div.task-meta', out) : null;
+  }
+
+  /* 제목 끝 표시(중요 깃발 · 반복 · 종 아이콘)는 마지막 낱말과 한 덩어리 — 제목이 줄 끝까지 차면 표시만 혼자 다음 줄로 떨어져
+     줄 하나가 아이콘 하나로 늘어나던 것 (11-15). 마지막 낱말이 아주 길면(12자 넘게 띄어쓰기 없음) 묶지 않음 — 좁은 화면에서 넘치지 않게 */
+  function titleParts(title, tail) {
+    tail = tail.filter(Boolean);
+    if (!tail.length) return title;
+    var i = title.lastIndexOf(' '), last = title.slice(i + 1);
+    if (!last || last.length > 12) return [title].concat(tail);
+    return [title.slice(0, i + 1), h('span.title-tail', last, tail)];
   }
 
   function render(it, o) {
@@ -5259,9 +5578,9 @@ App.row = (function () {
     var mt = meta(it, o);
     var body = h('div.task-body', { tabindex: 0, role: 'button', onclick: function () { if (App.reorder.busy()) return; openDetail(); },
         onkeydown: function (e) { if (!e.altKey && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(); } } },  /* 노트북: 탭 · 엔터로 열기 · Alt+↑/↓ = 순서 (reorder) */
-        h('div.task-title', task.title || t('row.untitled'),
+        h('div.task-title', titleParts(task.title || t('row.untitled'), [
           task.priority ? impMark('title') : null,   /* '중요' = 제목 끝 표시 하나(설정에서 고른 안) */
-          mt && mt.inline ? h('span.title-icons', mt.inline) : null),
+          mt && mt.inline ? h('span.title-icons', mt.inline) : null])),
         mt && mt.inline ? null : mt);
     /* 일정 묶음: 줄 왼쪽 시각 열('오후' 작게 / '3:00' 크게) — 하루의 뼈대가 캘린더 일정표처럼 읽히게 (순서 조수 B).
        오늘의 지난 시각은 글자만 흐리게 — '지금 어디쯤'이 선 없이 보이게 (D · 빨강 · 다그침 없음) */
@@ -5271,8 +5590,8 @@ App.row = (function () {
       var past = it.day === U.today() && !done && U.toMin(task.time) < nowMin;
       when = h('div.task-when' + (past ? '.is-past' : ''), tp.period ? h('span.when-ap', tp.period) : null, h('span.when-hm.num', tp.hm));
     }
-    var isNew = flashId === task.id;
-    if (isNew) Promise.resolve().then(function () { flashId = null; });   /* 빛은 한 번만 — 1.6초 안에 다시 그려도 처음부터 또 돌지 않게 (모션 점검원) */
+    var isNew = !!flashIds[task.id];
+    if (isNew) Promise.resolve().then(function () { flashIds = {}; });   /* 빛은 한 번만 — 1.6초 안에 다시 그려도 처음부터 또 돌지 않게 (모션 점검원) · 한 번 그리는 동안 여러 줄(가져오기)이 같이 빛남 */
     var row = h('div.task' + (done ? '.is-done' : '') + (isNew ? '.is-new' : '') + (when ? '.has-when' : ''), { 'data-id': task.id }, when, check, body, expand);
     var subs = h('div.subs', { hidden: !open[id] });
     /* 손 순서 줄만 끌 수 있음: 손 순서 묶음(o.manual) · 시간 없는 일 · '아래로'에서 가라앉은 끝낸 줄은 빼고 */
@@ -5323,8 +5642,11 @@ App.row = (function () {
       e.stopPropagation();
       open[id] = !open[id];
       expand.classList.toggle('is-open', !!open[id]); expand.setAttribute('aria-expanded', open[id] ? 'true' : 'false');
-      subs.hidden = !open[id];
-      if (open[id]) { drawSubs(subs, task, key); subs.classList.remove('is-opening'); void subs.offsetWidth; subs.classList.add('is-opening'); }   /* 펼칠 때 살짝 내려오며 나타남 */
+      /* 아래 줄 · 묶음은 뚝 밀리지 않고 미끄러짐 (motion.reflow · 11-14) */
+      App.motion.reflow(box, function () {
+        subs.hidden = !open[id];
+        if (open[id]) { drawSubs(subs, task, key); subs.classList.remove('is-opening'); void subs.offsetWidth; subs.classList.add('is-opening'); }   /* 펼칠 때 살짝 내려오며 나타남 */
+      });
     });
     return box;
   }
@@ -5373,12 +5695,12 @@ App.row = (function () {
       function lead(icon) { return h('span.prop-icon', { html: ic(icon, 20) }); }
 
       /* 맨 위 '중요' 켜기/끄기 한 번 누르기 — 창은 열린 채 깃발이 톡 (사용자 '꾹 눌러서 바로' · 4단계 색 공은 목록 색과 겹쳐 하나로 줄임) */
-      var flagOn = !!task.priority, state = h('span.flag-state'), fbtn = h('button.flag-toggle', { type: 'button', onclick: function () {
+      var flagOn = !!task.priority, state = h('span.mini-switch', { 'aria-hidden': 'true' }), fbtn = h('button.flag-toggle', { type: 'button', role: 'switch', onclick: function () {
         flagOn = !flagOn;
         S.commit(function (d) { T.update(d, task.id, { priority: flagOn ? 3 : 0 }); }, { undo: true });
         App.platform.haptic.tap(); paintFlag();
       } }, h('span.flag-ico', { html: ic('flag', 20) }), h('span', t('prio.on')), state);
-      function paintFlag() { fbtn.classList.toggle('is-on', flagOn); fbtn.setAttribute('aria-pressed', flagOn ? 'true' : 'false'); state.textContent = flagOn ? t('prio.onState') : t('prio.offState'); }
+      function paintFlag() { fbtn.classList.toggle('is-on', flagOn); fbtn.setAttribute('aria-checked', flagOn ? 'true' : 'false'); }   /* 자세히 창 '중요' 줄과 같은 스위치(11-14 · 옛 '켜짐 · 꺼짐' 글자) */
       paintFlag();
       b.appendChild(fbtn);
 
@@ -5541,7 +5863,8 @@ App.row = (function () {
   function section(label, items, o) {
     o = o || {};
     if (!items.length && !o.keepEmpty) return null;
-    var card = items.length ? h('div.card', items.map(function (it) { return render(it, o); })) : null;
+    /* o.rest = 접혀 안 그린 뒤쪽 줄들의 id — 끌기 · 위로/아래로가 그 줄까지 이웃으로 셈(보이는 5줄만 보고 순서를 매겨 놓은 줄이 접힌 곳 맨 끝으로 가던 것 · 구역 1) */
+    var card = items.length ? h('div.card', { 'data-rest': o.rest && o.rest.length ? o.rest.join(' ') : null }, items.map(function (it) { return render(it, o); })) : null;
     return h('section.section',
       label ? h('div.section-head', h('span.section-label', label), o.count != null ? h('span.section-count.num', String(o.count)) : null, o.action || null) : null,
       card && o.manual ? dragTip(card) : null,
@@ -5638,7 +5961,15 @@ App.row = (function () {
     /* '언제까지 지남 n' 보조 글은 뺐다(숫자 줄이기 · 10-31) — 펼치면 줄마다 '지남' 표시가 이미 있음 */
     return h('section.section.late-sec',
       h('div.section-head',
-        h('button.fold-btn', { type: 'button', 'aria-expanded': state.open ? 'true' : 'false', onclick: function () { state.open = !state.open; state.turn = true; App.render(); } },
+        h('button.fold-btn', { type: 'button', 'aria-expanded': state.open ? 'true' : 'false', onclick: function (e) {
+            state.open = !state.open; state.turn = true;
+            /* 펼치고 접을 때 아래 묶음들이 뚝 밀리지 않고 미끄러짐 — 다시 그리면 요소가 새로 생기므로 화면 안 차례(몇 번째 묶음)로 앞뒤 자리를 견줌 (11-14) */
+            var sec = e.currentTarget.closest('.late-sec'), sc = sec && sec.parentNode;
+            if (!sc || !sc.classList.contains('screen')) { App.render(); return; }
+            var at = [].indexOf.call(sc.children, sec), was = App.motion.tops([].slice.call(sc.children, at + 1));
+            App.render.now();
+            var now = document.querySelector('#main .screen'); if (now) App.motion.slide(was, [].slice.call(now.children, at + 1));
+          } },
           /* 접혀 있을 때는 '지난 일'만 — 매일 아침 쌓인 개수가 먼저 보이면 다그침 (감성 검토 10-31). 개수는 펼치면 단추에 */
           h('span.section-label', t('sec.overdue')),
           /* 다시 그려도 꺾쇠가 도는 게 보이게: 방금 누른 경우에만 돌기 효과 한 번 (모션 점검원) */
@@ -5692,12 +6023,14 @@ App.row = (function () {
   }
 
   /* 방금 넣은 할 일을 잠깐 은은하게 — 빠른 추가 창이 닫힌 뒤 눈이 '어디 들어갔지'를 찾게 (사용자 10-31). 화면 밖이면 보이는 자리로 살짝 끌어옴 */
-  var flashId = null, flashTimer = null;
+  /* id 하나 또는 여러 개(다른 날에서 가져오기 · 11-16) — 모두 빛나고, 화면은 첫 줄로 */
+  var flashIds = {}, flashTimer = null;
   function flash(id) {
-    flashId = id; clearTimeout(flashTimer);
-    flashTimer = setTimeout(function () { flashId = null; }, 1600);
+    var ids = Array.isArray(id) ? id : [id]; if (!ids.length) return;
+    flashIds = {}; ids.forEach(function (x) { flashIds[x] = 1; }); clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () { flashIds = {}; }, 1600);
     requestAnimationFrame(function () { requestAnimationFrame(function () {
-      var el = document.querySelector('.task[data-id="' + id + '"]');
+      var el = document.querySelector('.task[data-id="' + ids[0] + '"]');
       if (el && el.scrollIntoView) try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
     }); });
   }
@@ -5733,7 +6066,7 @@ App.screens.today = (function () {
   function progressRow(done, total, allDone) {
     var p = progress(done, total, allDone); if (!p) return null;
     if (!done) return h('div.progress-row', p);
-    return h('button.progress-row.is-tap', { type: 'button', 'aria-label': t('today.doneTodayTitle'), onclick: closeSheet }, p, h('span.progress-chev', { html: ic('chevR', 14), 'aria-hidden': 'true' }));
+    return h('button.progress-row.is-tap', { type: 'button', 'aria-label': t('today.doneTodayTitle'), onclick: function () { doneSheet(U.today()); } }, p, h('span.progress-chev', { html: ic('chevR', 14), 'aria-hidden': 'true' }));
   }
 
   function installTip(d) {
@@ -5741,7 +6074,8 @@ App.screens.today = (function () {
     if (!info.isIOS || info.standalone || d.settings.installTipClosed) return null;
     return h('div.banner',
       h('span', { html: ic('share', 22), style: { color: 'var(--accent-ink)' } }),
-      h('div.banner-body', h('b', t('install.title')), h('br'), t('install.text')),
+      /* 제목 → 하는 법 한 줄 → 까닭 한 줄 — 다섯 줄이 한 덩어리로 붙어 처음 온 아이폰 사용자가 읽다 마는 글이던 것 (11-14 · 내용은 그대로) */
+      h('div.banner-body', h('b.banner-title', t('install.title')), h('p.banner-step', t('install.step')), h('p.banner-why', t('install.why'))),
       h('button.icon-btn', { type: 'button', 'aria-label': t('common.close'), html: ic('x', 18), onclick: function () { S.commit(function (dd) { dd.settings.installTipClosed = true; }); } }));
   }
 
@@ -5766,7 +6100,7 @@ App.screens.today = (function () {
 
     var tip = installTip(d); if (tip) screen.appendChild(tip);
 
-    var hiddenTotal = p.hidden;
+    var hiddenTotal = p.hidden, lateHid = p.lateHidden;
     function part(items) { var r = Q.visible(Q.sort(items, st, App.row.isHeld), st, showDone); hiddenTotal += r.hidden; return r.items; }
 
     /* 시간 없는 일은 손 순서(새로 적은 일 = 맨 위 · 방금 적은 '은행 서류'가 묻히지 않게 · 1호 8번) · 지난 일은 날짜 순 */
@@ -5781,7 +6115,7 @@ App.screens.today = (function () {
       var yd = U.addDays(today, -1);
       var isY = function (it) { return it.task.repeat ? it.day === yd : it.task.date === yd || (!it.task.date && it.task.due === yd); };   /* 못 한 반복 회차는 그 회차 날로 (어제 회차면 '어제' 묶음에 이미 있음) */
       /* 지난 일에서 '어제' 묶음으로 옮겨 가는 줄 중 숨긴(끝낸) 것은 지난 일 셈에서 뺌 — 아래 '어제' 묶음이 다시 세므로 두 번 세던 것 (31호) */
-      if (st.doneMode === 'hide' && !showDone) hiddenTotal -= v.overdue.filter(function (it) { return isY(it) && Q.done(it); }).length;
+      if (st.doneMode === 'hide' && !showDone) { var yHid = v.overdue.filter(function (it) { return isY(it) && Q.done(it); }).length; hiddenTotal -= yHid; lateHid -= yHid; }
       late = late.filter(function (it) { return !isY(it); });
       /* 어제 칸 전체(끝낸 일 · 어제 반복 포함) — 0시에 반복 · 끝낸 일만 빠져 화면이 반쯤 바뀌지 않게 (6호 재확인 2번). 체크는 어제 회차에 */
       /* 어제 시작 · 오늘까지 이어지는 기간 일은 오늘 묶음에만 (두 번 안 나오게 · 6호 재확인 2차) */
@@ -5795,7 +6129,9 @@ App.screens.today = (function () {
          빈 화면만 보며 '안 들어갔나?' 하고 또 넣지 않게 (18호) */
       var next = Q.nextUp(d, today);   /* 위젯과 같은 셈(24호) */
       screen.appendChild(h('div.empty',
-        h('div.empty-mark', { html: ic('plus', 30) }),   /* 아무것도 없을 땐 '+' — 체크 그림은 '다 했어요'와 같아 헷갈렸음 (새 눈 점검원 2호 15번) */
+        /* 아무것도 없을 땐 '+' — 체크 그림은 '다 했어요'와 같아 헷갈렸음 (새 눈 점검원 2호 15번).
+           11-14: 그림이 아니라 단추 — 누르면 아래 + 와 똑같이 추가 창(오늘 날짜가 미리) */
+        h('button.empty-mark', { type: 'button', 'aria-label': t('qa.addTask'), html: ic('plus', 30), onclick: function () { App.quickadd.open({ date: U.today(), soft: true }); } }),
         h('p.empty-title', t('today.emptyTitle')), h('p.empty-text', t('today.emptyText')),
         next ? h('p.empty-next', t('today.nextUp', { what: I.relDay(next.day) + (next.task.time ? ' ' + I.time(next.task.time) : '') + ' · ' + next.task.title })) : null,
         next ? h('button.btn.soft.empty-go', { type: 'button', onclick: function () { App.screens.calendar.show(next.day); } }, t('today.seeCal')) : null));
@@ -5806,6 +6142,8 @@ App.screens.today = (function () {
     }
 
     var fold = App.row.lateFold(late, lateState);
+    /* 지난 일 띠가 없거나 접혀 있으면 그 속 끝낸 줄은 '끝낸 일 n개 보기'로도 안 보임 — 셈에서 뺌(눌러도 아무것도 안 나오던 것 · 구역 1). 끝낸 것은 '오늘 한 일'에 있음 */
+    if (!(fold && lateState.open)) hiddenTotal -= Math.max(0, lateHid);
     /* 빈 글 = 보일 줄이 하나도 없을 때 — 지난 일 띠(lateFold가 실제로 그리는지) · 오늘 · 언제든이 비고, '어제' 묶음에 안 끝낸 일도 없을 때.
        새벽 4시 전 '어제' 거르기를 한 뒤에 판정 — 어제 안 끝낸 일이 바로 아래 보이는데 '다 했어요'가 먼저 뜨던 것 (24 · 29호) */
     if (!fold && !now.length && !anytime.length && !yItems.some(function (it) { return !Q.done(it); })) {
@@ -5815,7 +6153,8 @@ App.screens.today = (function () {
     }
     if (ySec) screen.appendChild(ySec);
     if (fold) screen.appendChild(fold);
-    App.row.dayGroups(now, { all: v.today }).forEach(function (sec) { screen.appendChild(sec); });
+    /* 새벽 4시 전 '어제' 묶음이 있으면 오늘 카드에도 '오늘' 이름표 — 이름 없이 붙어 어제 일처럼 읽히던 것 (구역 1) */
+    App.row.dayGroups(now, { all: v.today, onceLabel: ySec ? t('sec.today') : undefined }).forEach(function (sec) { screen.appendChild(sec); });
     var sk = App.row.skipped(today); if (sk) screen.appendChild(sk);
     /* 언제든(날짜 없는 일) — 메모처럼 쌓아 두는 사람의 오늘 화면이 끝없이 길어지지 않게 6개 넘으면 위 5개 + 'n개 더 보기' 한 줄 (점검원 9호 10번) */
     /* 언제까지(마감)만 있는 일은 '언제든' 위에 따로 · 마감 가까운 순 — 접힌 '언제든' 속에 마감 있는 일이 숨지 않게 (16호) */
@@ -5823,7 +6162,7 @@ App.screens.today = (function () {
     var dueSec = App.row.section(t('sec.dueBy'), sd.due, {}); if (dueSec) screen.appendChild(dueSec);
     anytime = sd.rest;
     var many = anytime.length > 6 && !anyOpen;
-    var any = App.row.section(t('sec.anytime'), many ? anytime.slice(0, 5) : anytime, { manual: true,
+    var any = App.row.section(t('sec.anytime'), many ? anytime.slice(0, 5) : anytime, { manual: true, rest: many ? anytime.slice(5).map(function (it) { return it.task.id; }) : null,
       after: anytime.length > 6 ? h('button.show-done', { type: 'button', onclick: function () { anyOpen = !anyOpen; App.render(); } },
         anyOpen ? t('sec.anytimeLess') : t('sec.anytimeMore', { n: anytime.length - 5 })) : null });
     if (any) screen.appendChild(any);   /* 빈 묶음은 null · 손 순서 */
@@ -5838,18 +6177,37 @@ App.screens.today = (function () {
   /* 그날 한 일 — 끝낸 시각 순서(그날의 한 장 · 다꾸의 '다시 보는 시간'). 그날 자리의 일 + 그날 끝낸 다른 날 일 */
   function doneLog(day) { return Q.doneLog(S.data, day); }   /* 위젯 머리말과 같은 셈(놓친 매달 · 매년 회차 포함 · 26호) */
 
-  /* '오늘 한 일' 한 장 — 머리의 '3개 했어요'를 누르면 열림. 숫자 · 그래프 없이 시각 순서로만 (옛 '하루 닫기'의 남은 일 옮기기는 뺌 · 10-31 밤) */
-  function closeSheet() {
-    var day = U.today(), done = doneLog(day);
-    App.sheet.open({ title: t('today.doneTodayTitle'), content: function (body) {
-      body.appendChild(h('div.close-head', I.dateNoWeek(day), h('span.title-sub', I.weekday(U.dow(day)))));
-      body.appendChild(done.length ? h('div.done-log', done.map(function (it) {
+  /* '한 일' 한 장 — 오늘 머리의 '3개 했어요' · 캘린더 고른 날의 'n개 했어요'를 누르면 그날 것이 열림. 숫자 · 그래프 없이 끝낸 시각 순서로만
+     (옛 '하루 닫기'의 남은 일 옮기기는 뺌 · 10-31 밤).
+     11-14: 날짜 줄의 ‹ ›로 기록이 있는 앞뒤 날로 넘김 — '한 일이 보인다'가 앱의 정체성인데 지난 며칠을 돌아보려면 달력 칸을 하나씩 눌러야 했음.
+     빈 날은 건너뜀(빈 장을 넘기게 하지 않음) · 모양은 캘린더 머리('2026년 11월  ‹ ›')와 같게 */
+  function doneSheet(startDay) {
+    var day = startDay || U.today(), head = h('div.close-head'), box = h('div.done-box'), floor = 0;
+    function dateText(s) {
+      var p = U.parse(s), other = p.getFullYear() !== U.parse(U.today()).getFullYear();
+      return other ? new Intl.DateTimeFormat(I.lang, { year: 'numeric', month: 'long', day: 'numeric' }).format(p) : I.dateNoWeek(s);
+    }
+    function nav(to, icon, label) {
+      return h('button.icon-btn', { type: 'button', disabled: !to, 'aria-label': label, html: ic(icon, 22), onclick: function () { if (to) { day = to; draw(); } } });
+    }
+    function draw() {
+      var d = S.data, done = Q.doneLog(d, day), near = Math.abs(U.diffDays(U.today(), day)) <= 1;
+      App.dom.clear(head);
+      head.appendChild(h('span.close-date', near ? h('span.day-rel' + (day === U.today() ? '.is-today' : ''), I.relDay(day)) : null, dateText(day), h('span.title-sub', I.weekday(U.dow(day)))));
+      head.appendChild(h('span.close-nav', nav(Q.doneNear(d, day, -1), 'chevL', t('done.prev')), nav(Q.doneNear(d, day, 1), 'chevR', t('done.next'))));
+      App.dom.clear(box);
+      box.appendChild(done.length ? h('div.done-log', done.map(function (it) {
         var at = new Date(it.task.done[it.key]);
         return h('div.done-log-row', h('span.done-log-time.num', I.time(U.hm(at.getHours(), at.getMinutes()))), h('span.done-log-dot'), h('span.done-log-title', it.task.title));
-      })) : h('p.day-empty', t('today.noneDoneYet')));
-    } });
+      })) : h('p.day-empty', day === U.today() ? t('today.noneDoneYet') : t('cal.emptyPast')));
+      /* 넘기는 동안 창 높이가 줄었다 늘었다 하면 ‹ ›가 손 밑에서 달아남 — 한 번 커진 높이는 창을 닫을 때까지 지킴 */
+      box.style.minHeight = floor ? floor + 'px' : '';
+      floor = Math.max(floor, box.offsetHeight);
+    }
+    App.sheet.open({ title: t('done.title'), content: function (body) { body.appendChild(head); body.appendChild(box); draw(); } });
   }
-  return { render: render, closeSheet: closeSheet };
+  function closeSheet() { doneSheet(U.today()); }   /* 옛 이름 — 시험(preview_seed)이 씀 */
+  return { render: render, closeSheet: closeSheet, doneSheet: doneSheet };
 })();
 
 </script>
@@ -5868,7 +6226,8 @@ App.screens.calendar = (function () {
   function reset() { var n = U.parse(U.today()); st = { y: n.getFullYear(), m: n.getMonth(), sel: U.today() }; }
   /* 다른 화면에서 그날을 골라 캘린더로 (오늘 화면의 '다음 할 일 · 캘린더에서 보기' · 18호) */
   /* 큰 달력을 쓰는 사람이면 날 누르기와 같이 그날 목록을 올림(기억은 덮지 않는 '잠깐 들여다보기') — 큰 보기엔 고른 날 표시 · 목록이 없어 어느 날인지 안 보였음 (21호) */
-  function show(day) { var n = U.parse(day); st = { y: n.getFullYear(), m: n.getMonth(), sel: day }; App.go('calendar'); if (big) setTimeout(openDayStage, 20); }
+  /* 이미 캘린더를 보고 있으면(App.go는 같은 화면이면 그리지 않음) 그 자리에서 다시 그림 — 캘린더에서 연 자세히 창의 '다른 날에 복사 → 그날 보기'가 날만 바뀌고 화면은 그대로이던 것 (11-16) */
+  function show(day) { var n = U.parse(day); st = { y: n.getFullYear(), m: n.getMonth(), sel: day }; if (App.routeIs('calendar')) App.render.now(); else App.go('calendar'); if (big) setTimeout(openDayStage, 20); }
   /* 자정이 지났을 때: '오늘'을 보고 있었으면 새 오늘로, 다른 달 · 다른 날을 보고 있었으면 그대로 둔다 (1호 25번 재확인) */
   function dayChanged(prev) { if (!st || st.sel === prev) reset(); }
   /* 그날 공휴일 이름(여럿이면 ' · ') — 없으면 '' (domain/holidays.js · 2025-05-05 = '어린이날 · 부처님오신날') */
@@ -5904,7 +6263,9 @@ App.screens.calendar = (function () {
     track.style.transition = ms ? 'transform ' + ms + 'ms cubic-bezier(.25,.8,.25,1)' : 'none';
     track.style.transform = 'translate3d(' + to + 'px,0,0)';
     var done = false; function end() { if (done) return; done = true; finish(); }
-    if (ms) { track.addEventListener('transitionend', end, { once: true }); setTimeout(end, ms + 80); } else end();
+    /* 끝 신호는 판 자신의 transform 전환만 — 누른 칸의 바탕 전환(120ms)이 끝나며 올라온 신호에 미끄러짐이 반쯤에서 뚝 끊기던 것 (구역 2) */
+    function onEnd(e) { if (e.target !== track || e.propertyName !== 'transform') return; track.removeEventListener('transitionend', onEnd); end(); }
+    if (ms) { track.addEventListener('transitionend', onEnd); setTimeout(function () { track.removeEventListener('transitionend', onEnd); end(); }, ms + 80); } else end();
   }
   function finish() {
     if (!anim) return; var n = anim.next, open = anim.open; anim = null; st = n; panelIn = true;
@@ -6114,7 +6475,7 @@ App.screens.calendar = (function () {
       its.sort(function (a, b) { return (Q.done(a.it) - Q.done(b.it)) || ((b.it.task.priority ? 1 : 0) - (a.it.task.priority ? 1 : 0)) || (grp(a.it.task) - grp(b.it.task)) || (a.i - b.i); });
       its = its.map(function (x) { return x.it; });
       if (its.length || hiddenSpans) {
-        var room = Math.max(1, ROWS - colN - (hasHol ? 1 : 0)), more = its.length + hiddenSpans, show = more > room ? room - 1 : its.length;
+        var room = Math.max(1, ROWS - colN - (hasHol ? 1 : 0)), more = its.length + hiddenSpans, show = more > room ? Math.min(its.length, room - 1) : its.length;   /* 실제로 그리는 줄 수(꼬리표가 자리보다 적을 수 있음) — '+n'이 못 그린 띠까지 빠짐없이 세게 (32호) */
         peek = h('span.cal-peeks', { 'aria-hidden': 'true' }, its.slice(0, show).map(function (it) {
           var dn = Q.done(it);
           return h('span.cal-peek' + (dn ? '.is-done' : ''), mark(it.task, dn), h('span.pk-t', it.task.title));
@@ -6188,16 +6549,22 @@ App.screens.calendar = (function () {
             new Intl.DateTimeFormat(I.lang, { month: 'long' }).format(U.parse(st.sel))),
           /* 공휴일이면 요일 옆에 이름(빨강) — 작은 달력은 숫자 색만이라 무슨 날인지는 여기서 (사용자 11-01 1안) */
           h('span.day-sub-2', I.weekdayLong(selDow), selHol ? h('span.day-hol', selHol) : null))),
-      doneN ? h('span.day-count.num', t('cal.dayCount', { done: doneN })) : null);   /* 분수 대신 '3개 했어요' (10-31) */
+      /* 분수 대신 '3개 했어요' (10-31) · 11-14: 오늘 화면의 같은 글처럼 누르면 그날 '한 일' 창(같은 글 = 같은 동작 · 작은 › 로 눌린다는 걸 보임) */
+      doneN ? h('button.day-count.is-tap', { type: 'button', 'aria-label': t('done.title') + ', ' + t('cal.dayCount', { done: doneN }), onclick: function () { App.screens.today.doneSheet(st.sel); } },
+        h('span.num', t('cal.dayCount', { done: doneN })), h('span.progress-chev', { html: ic('chevR', 14), 'aria-hidden': 'true' })) : null);
     var past = st.sel < U.today(), body;
     /* 지난 날도 오늘 · 앞날과 같은 모양으로 그날 계획을 그대로 펼친다 — 한 일은 체크, 안 한 일은 빈 동그라미(빨강 · 문구 없음).
        10-31 22:5x 정정(사용자 '과거 날짜는 왜 기본이 접힘이야? 눌렀더니 아무 일정 안 떠서 보니 접혀 있었네 · 자기가 한 거 보면서 만족감 느끼는 사람도'):
        옛 '남은 일 보기' 접힘(3호 6번 · 실패 기록처럼 보이지 않게)은 색 · 문구가 없어진 지금 이득 없이 '빈 날처럼 보임'만 남아 뺌 (조수 판정).
        지난 날은 끌기 없이 메뉴만(fixed) · 오늘 화면의 '지난 일' 접힘은 그대로(고르지 않았는데 매일 아침 밀려오는 것이라) */
+    /* '다른 날에서 가져오기'(11-16 · screens/copy.js) — 이날을 받는 날로: 빈 날(오늘 · 앞날)은 안내 상자 안, 일이 있는 날은 목록 맨 아래 조용한 한 줄.
+       머리(큰 날짜 · 'n개 했어요')는 붐벼서 두지 않음 · 빈 지난 날('기록이 없어요')엔 없음 (워커와 합의) */
+    var day = st.sel;
+    function pullBtn(cls) { return h('button.text-btn.sm.day-pull' + (cls || ''), { type: 'button', onclick: function () { App.copy.pullInto(day); } }, h('span', { html: ic('download', 16) }), t('copy.pull')); }
     body = vis.length || also ? h('div.day-groups', vis.length ? App.row.dayGroups(vis, { all: items, fixed: past }) : null, also)
-      : h('div.day-empty', h('p', past ? t('cal.emptyPast') : t('cal.empty')), past ? null : h('p.day-empty-hint', t('cal.emptyHint')));   /* 빈 날: 어떻게 넣는지 한 줄(목록 빈 화면과 같은 말투 · 새 눈 점검원 1호 3번) · 지난 날은 안 붙임 */
+      : h('div.day-empty', h('p', past ? t('cal.emptyPast') : t('cal.empty')), past ? null : h('p.day-empty-hint', t('cal.emptyHint')), past ? null : pullBtn('.is-in-empty'));   /* 빈 날: 어떻게 넣는지 한 줄(목록 빈 화면과 같은 말투 · 새 눈 점검원 1호 3번) · 지난 날은 안 붙임 */
     /* '할 일 추가' 줄은 뺌 — 아래 가운데 +(넓은 화면은 떠 있는 +)가 캘린더에서 고른 날을 미리 넣어 줌 · 같은 일을 하는 단추 두 개 (사용자 11-01) */
-    return h('section.day-panel', head, body, App.row.skipped(st.sel));
+    return h('section.day-panel', head, body, App.row.skipped(st.sel), vis.length || also ? h('div.day-foot', pullBtn()) : null);
   }
 
   /* 머리 단추: '오늘'(오늘을 보고 있지 않을 때만) · ‹ › — 큰 보기에서 날을 바꿔 끼울 때도 이것만 다시 만듦.
@@ -6274,9 +6641,15 @@ App.screens.calendar = (function () {
   var fitRows = 4, fitH = '';
   function fitCheck(screen) {
     if (!screen || !screen.isConnected || anim || morph) return;
+    var r = fitMeasure(screen);
+    if (r != null && r !== fitRows) { fitRows = r; redrawFit(screen); }
+  }
+  /* 잼만(그리지 않음) — 큰 배치에서 칸이 보일 때만 값. 칸 자리 · 글자 크기가 그대로면 지난 값 */
+  function fitMeasure(screen) {
     var col = [].filter.call(screen.querySelectorAll('.cal-wcol'), function (c) { return c.clientHeight > 0 && !c.closest('.is-ghost'); })[0];
     var key = col ? col.clientHeight + '|' + getComputedStyle(document.documentElement).getPropertyValue('--text-scale') : '';   /* 칸 자리 · 글자 크기가 그대로면 다시 안 잼 */
-    if (!col || key === fitH) return;
+    if (!col) return null;
+    if (key === fitH) return fitRows;
     var H = col.clientHeight, peeks = h('span.cal-peeks', h('span.cal-peek', h('span.pk-t', '가'))), probe = h('span', { style: { position: 'absolute', visibility: 'hidden', left: '0', right: '0', top: '0' } },
       h('span.cal-lanes', h('span.cal-lane')), h('span.cal-hol', '가'), peeks, h('span.cal-more.num', '+1'));
     col.appendChild(probe);
@@ -6285,21 +6658,21 @@ App.screens.calendar = (function () {
     col.removeChild(probe);
     var r = 4; while (r > 1 && r * line + (r - 1) * inner + 2 * group > H) r--;   /* 덩어리(띠 · 이름 · 제목) 사이 틈 둘까지 */
     fitH = key;
-    if (r !== fitRows) { fitRows = r; redrawFit(screen); }
+    return r;
   }
   /* 줄 수가 바뀌면 달력 칸 판(.cal-grid)만 그 자리에서 바꿔 끼움 — 화면을 통째로 다시 만들면 탭 들어오는 움직임이 끊기고 초점 · 아래 창이 흔들림 (19호 재확인 2).
      지금 그리기가 끝난 바로 뒤(그리기 전에) · 옆 달 미리 만든 판도 옛 줄 수라 버리고 다시 만듦 */
   function redrawFit(screen) {
-    Promise.resolve().then(function () {
-      if (!screen.isConnected || anim || morph) return;
-      var track = screen.querySelector('.cal-track'), cur = track && track.querySelector('.cal-grid:not(.is-ghost)');
-      if (!cur) return;
-      var ae = document.activeElement, hadFocus = !!(ae && cur.contains(ae));
-      [].slice.call(track.querySelectorAll('.cal-grid.is-ghost')).forEach(function (g) { g.parentNode.removeChild(g); });
-      var ng = grid(S.data); track.replaceChild(ng, cur);
-      if (hadFocus) { var sel = ng.querySelector('.cal-cell.is-sel'); if (sel) try { sel.focus({ preventScroll: true }); } catch (e) {} }
-      prebuild(track);
-    });
+    Promise.resolve().then(function () { if (screen.isConnected && !anim && !morph) swapGrid(screen); });
+  }
+  function swapGrid(screen) {
+    var track = screen.querySelector('.cal-track'), cur = track && track.querySelector('.cal-grid:not(.is-ghost)');
+    if (!cur) return;
+    var ae = document.activeElement, hadFocus = !!(ae && cur.contains(ae));
+    [].slice.call(track.querySelectorAll('.cal-grid.is-ghost')).forEach(function (g) { g.parentNode.removeChild(g); });
+    var ng = grid(S.data); track.replaceChild(ng, cur);
+    if (hadFocus) { var sel = ng.querySelector('.cal-cell.is-sel'); if (sel) try { sel.focus({ preventScroll: true }); } catch (e) {} }
+    prebuild(track);
   }
   /* 아래 탭 윗변 = 칸 높이를 잴 바닥. 키보드가 떠 화면이 줄어든 동안에는 키보드 전 자리(app.js App.viewport) —
      일정 추가 창이 키보드와 함께 올라와도 뒤 달력은 그대로 (사용자 11-01 '뒤는 그냥 뒤 그대로 두고 추가만 추가인 건데') */
@@ -6380,12 +6753,15 @@ App.screens.calendar = (function () {
     dropMorph();
     if (anim) finish();
     var start = stageOf(mode);
-    var weeks = weeksOf(screen), grab = screen.querySelector('.cal-grab'), panel = screen.querySelector('.day-panel');
-    if (!weeks.length || !grab) return null;
-    var selW = 0; weeks.forEach(function (w, i) { if (w.classList.contains('has-sel')) selW = i; });
+    if (!weeksOf(screen).length || !screen.querySelector('.cal-grab')) return null;
     /* 반반 배치에서 잼 */
     screen.classList.remove('is-big', 'is-list');
     sizeBig(screen);
+    /* 큰 칸에 들어가는 줄 수를 전환 전에 먼저 맞춤 — 반반에선 잴 수 없어 처음 크게 갈 때 4줄 그림으로 내려앉은 뒤 바뀌던 것 (구역 2) */
+    screen.classList.add('is-big'); var fr = fitMeasure(screen); screen.classList.remove('is-big');
+    if (fr != null && fr !== fitRows) { fitRows = fr; swapGrid(screen); }
+    var weeks = weeksOf(screen), grab = screen.querySelector('.cal-grab'), panel = screen.querySelector('.day-panel');
+    var selW = 0; weeks.forEach(function (w, i) { if (w.classList.contains('has-sel')) selW = i; });
     var panes = sizePanes(screen);
     var sNum = weeks.map(numTop), sGrab = topOf(grab), sRowH = weeks[0].offsetHeight, selOff = topOf(weeks[selW]) - topOf(weeks[0]);
     var splitH = panel ? panel.offsetHeight : 0, L = 0;
@@ -6483,6 +6859,9 @@ App.screens.calendar = (function () {
       if (keepY > maxY) m.panel.style.paddingBottom = (m.padB + keepY - maxY) + 'px';
       m.panel.scrollTop = keepY;
     }
+    /* 아래 목록이 보이는 단에 닿으면 기억해 둔 스크롤을 지금 자리로 — 큰 보기에서 숨겨졌다 돌아오면 목록은 맨 위인데 옛 자리가 남아,
+       다음 다시 그리기(체크 등)에 목록이 예전 자리로 훅 내려가던 것 (36호) */
+    if (!big && m.panel && m.panel.isConnected) paneScroll = { sel: st.sel, y: m.panel.scrollTop };
     lockWhenTop(m.screen);   /* 세 단 모두 화면 고정 — 맨 위에 닿으면 잠금 */
     if (big) fitCheck(m.screen);   /* 큰 달력에 처음 닿았을 때 칸에 들어가는 줄 수 */
   }
@@ -6657,7 +7036,7 @@ App.screens.lists = (function () {
     lists.forEach(function (l) {
       var n = Q.remaining(d, l.id);
       var row = h('button.prop.list-row.task-wrap', { type: 'button', 'data-drag': lists.length > 1 ? l.id : null, 'data-k': 'list|' + l.id, onclick: function () { if (App.reorder.busy()) return; App.go('list', l.id); } },
-        App.listMark(l), h('span.prop-label', l.name),
+        h('span.prop-icon', App.listMark(l)), h('span.prop-label', l.name),   /* 표시는 '새 목록' + 와 같은 칸에 (11-16 세로줄 맞춤) */
         h('span.prop-value.num', n ? t('lists.left', { n: n }) : ''), h('span.prop-chev', { html: ic('chevR', 18) }), h('span.task-grip', { 'aria-hidden': 'true', html: ic('grip', 16) }));
       /* 할 일 줄과 같은 손짓: 꾹 → 들림 → 떼면 목록 '…' 창 · 움직이면 끌어서 목록 순서 바꾸기 (점검원 9호 7번 '목록 순서를 바꿀 길이 없음') */
       App.reorder.bind(row, row, { onMenu: function () { more(l); }, onTap: function () { App.go('list', l.id); }, onDrop: function (ids) {
@@ -6682,7 +7061,45 @@ App.screens.lists = (function () {
         h('div.chips.wrap', sugg.map(function (s) { return h('button.chip', { type: 'button', onclick: function () { create(s, true); } }, h('span', { html: ic('plus', 16) }), s); })),
         h('p.hint', t('lists.hint'))));
     }
+    /* 최근 지운 항목 — 지운 것이 있을 때만 맨 아래 조용한 한 줄 (11-14: 설정에서 옮김 — 설정에는 설정만 · 애플 메모 · 미리 알림처럼 '내 것들' 화면 맨 아래).
+       없을 땐 줄도 없음(빈 휴지통이 늘 자리를 차지하지 않게). 지운 직후의 길은 그대로 되돌리기 띠 */
+    var goneN = gone().length;
+    if (goneN) screen.appendChild(h('div.card.mt-l.trash-card', h('button.prop', { type: 'button', onclick: trash }, h('span.prop-icon', { html: ic('trash', 20) }),
+      h('span.prop-label', t('trash.row'), h('span.prop-sub', t('trash.sub'))),
+      h('span.prop-value.num', t('trash.count', { n: goneN })), h('span.prop-chev', { html: ic('chevR', 18) }))));
     main.appendChild(screen);
+  }
+
+  /* 지운 뒤 30일 동안 되살릴 수 있음 (점검원 1호 6번) */
+  function gone() { return S.data.tasks.filter(function (x) { return x.deletedAt; }).concat(S.data.lists.filter(function (l) { return l.deletedAt; })); }
+  function trash() {
+    var s = App.sheet.open({ title: t('trash.row'), content: function (body) {
+      function draw() {
+        App.dom.clear(body);
+        var goneTasks = S.data.tasks.filter(function (x) { return x.deletedAt; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
+        /* 지운 목록도 30일 동안 — 되살리면 안에 있던 할 일이 다시 그 목록으로 (6호 6번) */
+        var goneLists = S.data.lists.filter(function (l) { return l.deletedAt; });
+        if (!goneTasks.length && !goneLists.length) { body.appendChild(h('p.day-empty', t('trash.empty'))); return; }
+        function left(at) { var days = Math.max(0, 30 - Math.floor((App.util.now() - at) / 86400000)); return days > 0 ? t('trash.left', { n: days }) : t('trash.leftToday'); }
+        body.appendChild(h('div.card', goneLists.map(function (l) {
+          return h('div.set-row',
+            h('span.prop-label', t('trash.listRow', { name: l.name }), h('span.prop-sub', left(l.deletedAt))),
+            h('button.text-btn', { type: 'button', onclick: function () {
+              S.commit(function (d) { T.restoreList(d, l.id); });
+              App.toast.show(t('trash.restored')); draw();
+            } }, t('trash.restore')));
+        }).concat(goneTasks.map(function (x) {
+          return h('div.set-row',
+            h('span.prop-label', x.title || t('row.untitled'), h('span.prop-sub', left(x.deletedAt))),
+            h('button.text-btn', { type: 'button', onclick: function () {
+              S.commit(function (d) { T.restore(d, x.id); });
+              App.toast.show(t('trash.restored')); draw();
+            } }, t('trash.restore')));
+        }))));
+      }
+      draw();
+    } });
+    return s;
   }
 
   /* 찾기 — 제목 · 메모 · 세부 할 일 (끝낸 일 포함). "그 보고서 언제 했지?"를 달력 넘기지 않고 (점검원 1호 13번) */
@@ -6722,7 +7139,7 @@ App.screens.lists = (function () {
             var dot = body.querySelector('.emoji-opt .list-dot'); if (dot) dot.className = 'list-dot c-' + c;
           } });
       })));
-      if (M.LIST_COLORS.indexOf(acc) >= 0) body.appendChild(h('p.pick-note', t('list.accentSame', { color: t('color.' + acc) })));
+      if (M.LIST_COLORS.indexOf(acc) >= 0) body.appendChild(h('p.swatch-note', t('list.accentSame', { color: t('color.' + acc) })));
       /* 표시 — 색 점 대신 이모지 하나 (나만의 표시 · 커스텀 범위 조수 10-31). 기본은 색 점, 원하는 사람만 이 창에서 고름 */
       /* 무난하게 많이 쓰는 구분용만 — 너무 많으면 고르기가 일이 됨 (사용자 10-31 '튀지 않고 모나지 않게 · 난잡하지 않게').
          11-01 사용자 '이모지 예시가 너무 많은 느낌 · 공 · 카메라만 두 개 따닥 있고 갑자기 줄바뀜' → 1안: 한 판 6칸 격자
@@ -6734,9 +7151,17 @@ App.screens.lists = (function () {
         [].forEach.call(body.querySelectorAll('.emoji-opt'), function (b) { b.classList.toggle('is-on', b === me); });
       }
       body.appendChild(h('p.pick-label', { text: t('list.mark') }));
+      /* 표시 격자는 지금 데이터로 그리는 함수 하나 — 내 사진을 꾹 눌러 빼거나 되돌리면 그 자리에서 다시 그림
+         (예전엔 처음 연 모습 그대로라, 뺀 사진이 창을 닫았다 열어야 사라지던 것 · 사용자 11-02) */
+      var markRow = h('div.emoji-row');
+      body.appendChild(markRow);
+      function drawMarks() {
+      if (s && s.closed) return;
+      l = T.list(S.data, l.id) || l;   /* 되돌리기는 데이터를 통째로 바꾸므로 늘 지금 목록으로 */
+      App.dom.clear(markRow);
       var custom = l.emoji && !l.photo && EMO.indexOf(l.emoji) < 0 ? l.emoji : '';   /* 9개 밖의 이모지(직접 넣은 것 · 옛 💄 💰 📝)는 '직접 넣기' 칸에 그 이모지로 보이며 골라져 있음 */
       /* 카메라가 늘 맨 왼쪽 위 · 고른 것 없으면 테두리는 둘째 칸 색 점 (사용자 11-01 '공이랑 카메라 자리만 바꾸면 · 기본 포커스는 공') */
-      body.appendChild(h('div.emoji-row', [
+      [
         /* 사진 — 앨범에서 한 장 → 동그랗게 맞추기 (예: 연인과의 약속 목록에 그 사람 얼굴). 맞춘 사진은 '내 사진'으로 남아 다른 목록에도 바로 고름 */
         h('button.emoji-opt.is-photo', { type: 'button', 'aria-label': t('list.markPhoto'), onclick: function () {
           s.close(true);
@@ -6753,17 +7178,20 @@ App.screens.lists = (function () {
         } }, h('span', { html: ic('camera', 18) })),
         h('button.emoji-opt' + (!l.emoji && !l.photo ? '.is-on' : ''), { type: 'button', 'aria-label': t('list.markDot'), onclick: function (ev) { setEmoji(null, ev.currentTarget); } }, h('span.list-dot.c-' + l.color))]
         /* 내 사진 칸 — 누르면 이 목록 표시로 · 꾹 누르면 '내 사진에서 빼기'(이미 쓰는 목록은 그대로) */
-        .concat((S.data.settings.myPhotos || []).map(function (p) {
+        /* 이 목록이 지금 쓰는 사진은 '내 사진'에서 뺐더라도 맨 앞에 고름 표시로 — 지금 표시가 격자 어디에도 안 보이던 것 (34호). 그 칸은 '내 사진'이 아니라 꾹 눌러 뺄 것이 없음 */
+        .concat((function () { var mine = S.data.settings.myPhotos || []; return (l.photo && mine.indexOf(l.photo) < 0 ? [l.photo] : []).concat(mine); })().map(function (p) {
+          var inMine = (S.data.settings.myPhotos || []).indexOf(p) >= 0;
           var b = h('button.emoji-opt.is-mine' + (l.photo === p ? '.is-on' : ''), { type: 'button', 'aria-label': t('list.myPhoto'), onclick: function () {
             if (Date.now() < b._held) return;
             S.commit(function (d) { T.updateList(d, l.id, { photo: p, emoji: null }); }); App.platform.haptic.tap();
             [].forEach.call(body.querySelectorAll('.emoji-opt'), function (x) { x.classList.toggle('is-on', x === b); });   /* 그 자리에서 바뀜 (3호 4번) */
           } }, h('img.list-photo', { src: p, alt: '' }));
-          App.row.longPress(b, function () {
+          if (inMine) App.row.longPress(b, function () {
             b._held = Date.now() + 600;
             P.confirm({ title: t('list.myPhotoDelQ'), text: t('list.myPhotoDelText'), ok: t('list.myPhotoDel'), onOk: function () {
               S.commit(function (d) { d.settings.myPhotos = (d.settings.myPhotos || []).filter(function (x) { return x !== p; }); }, { undo: true });
-              App.toast.show(t('list.myPhotoDeleted'), { action: t('common.undo'), onAction: S.undo });
+              drawMarks();   /* 뺀 사진이 바로 사라지게 */
+              App.toast.show(t('list.myPhotoDeleted'), { action: t('common.undo'), onAction: function () { S.undo(); drawMarks(); } });
             } });
           });
           return b;
@@ -6776,13 +7204,16 @@ App.screens.lists = (function () {
             var first = window.Intl && Intl.Segmenter ? (new Intl.Segmenter().segment(v)[Symbol.iterator]().next().value || {}).segment : Array.from(v)[0];
             S.commit(function (d) { T.updateList(d, l.id, { emoji: first || null, photo: null }); });
           } });
-        } }, custom || h('span', { html: ic('plus', 16) })))));
+        } }, custom || h('span', { html: ic('plus', 16) })))
+      .forEach(function (x) { markRow.appendChild(x); });
+      }
+      drawMarks();
       /* 맨 아래 흐린 지우기 — 할 일 줄 메뉴와 같은 모양(menu-delete · 휴지통 아이콘) */
       body.appendChild(h('button.menu-delete', { type: 'button', onclick: function () {
         s.close(true);
         P.confirm({ title: t('list.deleteQ', { name: l.name }), text: t('list.deleteText'), ok: t('list.delete'), onOk: function () {
           S.commit(function (d) { T.removeList(d, l.id); d.settings.listSuggestOff = true; }, { undo: true });
-          App.go('lists');
+          if (App.routeIs('list', l.id)) App.go('lists');   /* 지운 목록을 보고 있었을 때만 — 그 밖엔 보던 화면 · 스크롤 그대로 (35호) */
           App.toast.show(t('list.deleted'), { action: t('common.undo'), onAction: S.undo });
         } });
       } }, h('span', { html: ic('trash', 18) }), t('list.delete')));
@@ -6819,7 +7250,9 @@ App.screens.lists = (function () {
     function part(items, late) { var r = Q.visible(late ? Q.sortLate(items) : Q.sort(items, st, App.row.isHeld), st, !!showDoneFor[id]); hidden += r.hidden; return r.items; }
     /* 빈 묶음은 section이 null을 돌려준다 → 붙이지 않음 (배치 점검에서 잡힌 오류 · 10-31) */
     function add(x) { if (x) screen.appendChild(x); }
-    add(App.row.lateFold(part(v.overdue, true), lateStates[id], o));
+    var h0 = hidden, lateItems = part(v.overdue, true), fold = App.row.lateFold(lateItems, lateStates[id], o);
+    if (!(fold && lateStates[id].open)) hidden = h0;   /* 접혔거나 없는 지난 일 띠 속 끝낸 줄은 '끝낸 일 보기'로 안 보이므로 셈에서 뺌 — 오늘 화면과 같은 규칙 (구역 1) */
+    add(fold);
     App.row.dayGroups(part(v.today), Object.assign({ all: v.today, onceLabel: t('sec.today') }, o)).forEach(add);
     add(App.row.section(t('sec.upcoming'), v.upcoming, Object.assign({ showDay: true }, o)));   /* 다가오는 일 = 날짜 순(끌기 없음) */
     var sd = Q.splitDue(part(v.anytime), st, App.row.isHeld);   /* 언제까지만 있는 일은 따로 · 마감 가까운 순 (오늘 화면과 같게 · 16호) */
@@ -6843,7 +7276,7 @@ App.screens.lists = (function () {
     main.appendChild(screen);
   }
 
-  return { overview: overview, single: single, search: search, more: more };
+  return { overview: overview, single: single, search: search, more: more, trash: trash };
 })();
 
 </script>
@@ -6859,7 +7292,7 @@ App.detail = (function () {
     /* 체크 열쇠는 그릴 때마다 다시 정한다 (창 안에서 반복을 켜고 끄면 열쇠가 'once' ↔ 날짜로 바뀜) */
     var day = key && key !== 'once' ? key : U.today();
     key = T.keyFor(task, day);
-    var props = h('div.card.props'), subsBox = h('div.subs-edit'), headBox = h('div');
+    var props = h('div.card.props'), subsBox = h('div.subs-edit'), headBox = h('div'), copyBox = h('div.copy-box');
     var title = h('textarea.detail-title', { rows: 1, 'aria-label': t('detail.titleLabel'), enterkeyhint: 'done', maxlength: 300 });
     title.value = task.title;
     var note = h('textarea.field.note', { rows: 3, placeholder: t('prop.notePh'), 'aria-label': t('prop.note') });
@@ -6887,6 +7320,7 @@ App.detail = (function () {
       if (task.subtasks && task.subtasks.length) { body.appendChild(subsSec); body.appendChild(props); }
       else { body.appendChild(props); body.appendChild(subsSec); }
       body.appendChild(h('section.detail-block', h('div.block-label', t('prop.note')), note));
+      body.appendChild(copyBox);   /* '다른 날에 복사'(반복 아닌 일만 · drawCopy) — 지우기 바로 위, 같은 조용한 단추 (11-16) */
       body.appendChild(h('button.delete-btn', { type: 'button', onclick: remove }, h('span', { html: ic('trash', 18) }), t('detail.delete')));
     } });
 
@@ -6899,7 +7333,8 @@ App.detail = (function () {
     var titleSoon = U.debounce(saveTitle, 500), noteSoon = U.debounce(saveNote, 500);
     title.addEventListener('input', function () { App.dom.autosize(title); titleSoon(); });
     title.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); title.blur(); } });
-    title.addEventListener('blur', function () { if (!title.value.trim() && cur()) title.value = cur().title; saveTitle(); });
+    /* 나갈 때 칸 글도 저장된 모양(여러 줄 → 한 줄)으로 — 창에선 여러 줄 · 목록에선 한 줄로 다르게 보이던 것 (구역 3) */
+    title.addEventListener('blur', function () { saveTitle(); if (cur() && title.value !== cur().title) { title.value = cur().title; App.dom.autosize(title); } });
     note.addEventListener('blur', saveNote);
     note.addEventListener('input', function () { App.dom.autosize(note); noteSoon(); });
 
@@ -6917,13 +7352,15 @@ App.detail = (function () {
         /* 회차 줄: 보이는 날 = 옮겼으면 옮긴 날(열쇠는 원래 날) · '이번만 옮기기'(고를 날이 있을 때) · '이번만 건너뛰기' (22호) */
         var shown = (tk.moved || {})[key] || key, canMove = !done && App.query.moveRange(tk, key);
         headBox.appendChild(h('div.occ-line',
-          h('span', { html: ic('repeat', 15) }), h('span', t('detail.occurrence', { date: I.dateShort(shown) })),
-          canMove ? h('button.text-btn.sm', { type: 'button', onclick: function () { App.row.pickOccurrence(tk, key, shown, function () { draw(); }); } }, t('move.once')) : null,
-          done ? null : h('button.text-btn.sm', { type: 'button', onclick: function () {   /* 끝낸 회차는 건너뛰기 없음 (4호 2번) */
-            S.commit(function (d) { T.skip(d, id, key); }, { undo: true });
-            sheet.close();
-            App.toast.show(t('detail.skipped', { date: I.dateNoWeek(shown) }), { action: t('common.undo'), onAction: S.undo });
-          } }, t('detail.skip'))));
+          h('span', { html: ic('repeat', 15) }), h('span.occ-date', t('detail.occurrence', { date: I.dateShort(shown) })),
+          /* 단추 둘은 한 묶음 — 날짜 아래 줄에 알약 단추로(11-14 · 옛 35호: 오른쪽 끝 회색 글자라 단추인 줄 모름) */
+          done ? null : h('span.occ-acts',
+            canMove ? h('button.text-btn.sm', { type: 'button', onclick: function () { App.row.pickOccurrence(tk, key, shown, function () { draw(); }); } }, t('move.once')) : null,
+            h('button.text-btn.sm', { type: 'button', onclick: function () {   /* 끝낸 회차는 건너뛰기 없음 (4호 2번) */
+              S.commit(function (d) { T.skip(d, id, key); }, { undo: true });
+              sheet.close();
+              App.toast.show(t('detail.skipped', { date: I.dateNoWeek(shown) }), { action: t('common.undo'), onAction: S.undo });
+            } }, t('detail.skip')))));
       }
       requestAnimationFrame(function () { App.dom.autosize(title); App.dom.autosize(note); });
     }
@@ -6987,6 +7424,7 @@ App.detail = (function () {
           add.value = '';  /* 칸을 지울 때 blur가 또 넣지 않게 먼저 비운다 */
           S.commit(function (d) { T.addSub(d, id, v); });
           drawSubs();   /* 같은 칸이 남아 초점 · 키보드 그대로 — 다음 줄을 바로 이어 씀 */
+          try { add.scrollIntoView({ block: 'nearest' }); } catch (x) {}   /* 위에 줄이 하나 끼면 칸이 밀려 창 아래로 숨던 것 — 필요할 때만 그만큼 (구역 3) */
         }
       });
       add.addEventListener('blur', function () { var v = add.value.trim(); if (v) { add.value = ''; S.commit(function (d) { T.addSub(d, id, v); }); drawSubs(); } });
@@ -7058,7 +7496,7 @@ App.detail = (function () {
       if (tk.repeat) { P.date({ title: t('prop.start'), value: tk.date, allowNone: false, onPick: function (v) { if (v) set({ date: v, time: tk.time }); } }); return; }
       P.date({ range: true, value: tk.date, end: tk.due, onPick: function (a, b) {
         var now = cur(); if (!now) return;
-        if (!a) { clear({ date: null, time: null, due: null }, t('prop.date')); return; }
+        if (!a) { clear({ date: null, time: null, due: null }, t(now.date ? 'prop.date' : 'prop.due')); return; }   /* 언제까지만 있던 일이면 띠도 '언제까지' (구역 3) */
         var before = now.date;
         if (now.due && !b) clear({ date: a, due: null, time: now.time }, t('prop.due'));
         else { set({ date: a, due: b || null, time: now.time }); noteMoved(before); }
@@ -7100,8 +7538,10 @@ App.detail = (function () {
            - 반복이 없거나 끝낸 일 = 시작 날이 지났으면 오늘 기준으로 보이고, 고르면 그 날을 시작 날로 같이 저장 */
         function () {
           var live = tk.repeat && !ended, anchor = live ? tk.date : (tk.date && tk.date >= U.today() ? tk.date : U.today());
+          /* 반복이 없던(또는 끝낸) 일 — 창 안에서 요일을 켰다 다 끄면 열 때 모습(날짜 · 끝낸 반복 기록)으로 되돌림. 아니면 '반복 끄기'가 돼 날짜만 오늘로 남던 것 (구역 3) */
+          var openDate = tk.date, openRepeat = tk.repeat ? JSON.parse(JSON.stringify(tk.repeat)) : null;
           P.repeat({ value: live ? tk.repeat : null, anchor: anchor, onPick: function (v) {
-            if (!v && ended) return;                                  /* 이미 끝낸 반복 */
+            if (!v && !live) { var nowTk = cur(); if (nowTk && (JSON.stringify(nowTk.repeat || null) !== JSON.stringify(openRepeat) || nowTk.date !== openDate)) set({ repeat: openRepeat, date: openDate }); return; }
             if (!v && tk.repeat) { turnOff(); return; }   /* '반복 안 함' = 한 가지 규칙(T.turnOffRepeat — 지난 기록이 있으면 반복 끝내기 · 기록 남김 · 1호 2번 재확인) */
             set(!live && v && anchor !== tk.date ? { repeat: v, date: anchor } : { repeat: v });
           } });
@@ -7124,7 +7564,7 @@ App.detail = (function () {
             else set({ repeat: r });
           } }); },
           until ? function () { var r = Object.assign({}, tk.repeat, { until: null }); clear({ repeat: r }, t('prop.repeatUntil')); } : null));
-      } else if (!tk.repeat && !tk.date) props.appendChild(prop('target', t('prop.due'),   /* '언제까지'만 있는 일(옛 데이터 · 글로 '금요일까지')만 따로 한 줄 — 날짜가 있으면 날짜 줄이 기간까지 맡음 */ tk.due ? I.relDay(tk.due) : null,
+      } else if (!tk.repeat && !tk.date && tk.due) props.appendChild(   /* 언제까지가 없는 '언제든' 일엔 안 보임 — 같은 날짜 창이 열려 할 날로 잡히던 것(줄 이름과 결과가 다름 · 34호). 날짜 없는 일의 날짜 · 기간은 위 '날짜' 줄 하나로 */prop('target', t('prop.due'),   /* '언제까지'만 있는 일(옛 데이터 · 글로 '금요일까지')만 따로 한 줄 — 날짜가 있으면 날짜 줄이 기간까지 맡음 */ tk.due ? I.relDay(tk.due) : null,
         function () { pickDates(tk); },   /* 날짜 줄과 같은 창 — 하루 · 기간을 한 달력에서 */
         function () { clear({ due: null }, t('prop.due')); }, null, shiftDue));
       /* '○일부터 ○일까지'의 두 뜻을 고르는 한 줄 (사용자 10-31 · 설계 조수):
@@ -7145,10 +7585,17 @@ App.detail = (function () {
           h('p.span-mode-note', t(mode === 'once' ? 'span.onceNote' : 'span.dailyNote'))));
       }
       /* '중요' = 켜기/끄기 스위치 한 줄 — › 가 붙어 다른 창이 열릴 것처럼 보이던 것 (점검원 9호 13번). 누르면 바로 바뀜 · 깃발 빨강 */
+      /* 11-14: 누르면 그 단추의 표시만 바꾸고 저장 — 예전엔 줄 전체를 새로 만들어 스위치 손잡이가 미끄러지지 않고 툭 바뀌었음(꾹 메뉴 · 시간 창의 스위치는 미끄러짐) */
       var fOn = !!tk.priority;
-      props.appendChild(h('div.prop-wrap', h('button.prop.prop-toggle' + (fOn ? '.is-set.is-flag-on' : ''), { type: 'button', role: 'switch', 'aria-checked': fOn ? 'true' : 'false',
-          onclick: function () { set({ priority: fOn ? 0 : 3 }); App.platform.haptic.tap(); } },
-        h('span.prop-icon', { html: ic('flag', 20) }), h('span.prop-label', t('prio.on')), h('span.mini-switch', { 'aria-hidden': 'true' }))));
+      var fBtn = h('button.prop.prop-toggle' + (fOn ? '.is-set.is-flag-on' : ''), { type: 'button', role: 'switch', 'aria-checked': fOn ? 'true' : 'false',
+          onclick: function () {
+            fOn = !fOn;
+            fBtn.classList.toggle('is-set', fOn); fBtn.classList.toggle('is-flag-on', fOn); fBtn.setAttribute('aria-checked', fOn ? 'true' : 'false');
+            S.commit(function (d) { T.update(d, id, { priority: fOn ? 3 : 0 }); });
+            App.platform.haptic.tap();
+          } },
+        h('span.prop-icon', { html: ic('flag', 20) }), h('span.prop-label', t('prio.on')), h('span.mini-switch', { 'aria-hidden': 'true' }));
+      props.appendChild(h('div.prop-wrap', fBtn));
       var l = tk.listId && T.list(d, tk.listId);
       props.appendChild(prop('folder', t('prop.list'), l ? l.name : null,
         function () { P.list({ value: tk.listId, onPick: function (v) { set({ listId: v }); } }); },
@@ -7160,7 +7607,14 @@ App.detail = (function () {
       /* day = 회차 열쇠(원래 날). 이번만 옮긴 회차도 그 열쇠 그대로(원래 날엔 안 보여도 회차임 · 22호) */
       if (cur().repeat && !App.query.showsOn(cur(), day) && !App.query.isOccKey(cur(), day)) day = App.repeat.next(cur().repeat, cur().date, U.today()) || day;
       key = T.keyFor(cur(), day);
-      drawHead(); drawSubs(); drawProps();
+      drawHead(); drawSubs(); drawProps(); drawCopy();
+    }
+    /* 반복 일은 복사하지 않음(반복 규칙대로 이미 뜸 · tasks.copyTo) — 창 안에서 반복을 켜고 끄면 단추도 따라 나타나고 사라짐 */
+    function drawCopy() {
+      App.dom.clear(copyBox);
+      if (cur().repeat) return;
+      copyBox.appendChild(h('button.delete-btn.copy-btn', { type: 'button', onclick: function () { saveTitle(); saveNote(); App.copy.taskTo(id); } },   /* 쓰던 이름 · 메모까지 저장한 뒤 복사 */
+        h('span', { html: ic('copy', 18) }), t('copy.one')));
     }
 
     function hasPast(tk) { return T.hasPast(tk, U.today()); }
@@ -7219,12 +7673,17 @@ App.quickadd = (function () {
       man.priority = val('priority') ? 0 : 3; App.platform.haptic.tap(); draw(); refocus();
     } }, h('span.flag-ico', { html: ic('flag', 18) }), h('span', t('prio.on')));
 
+    /* 창 안 내용은 한 칸(wrap)에 — 한 번 커진 높이는 창을 닫을 때까지 지킴(draw 끝의 keepHeight).
+       첫 글자를 치면 안내 한 줄이 사라지며 창이 그만큼 줄어, 쓰던 입력 칸이 손 밑에서 덜컹 내려앉던 것 (11-14) */
+    var wrap = h('div.qa-wrap'), floor = 0;
+    function keepHeight() { wrap.style.minHeight = ''; floor = Math.max(floor, wrap.offsetHeight); wrap.style.minHeight = floor + 'px'; }
     var sheet = App.sheet.open({ className: 'qa-sheet', head: flagBtn, title: preset.listId ? (T.list(S.data, preset.listId) || {}).name : '', focus: input, content: function (body) {
-      body.appendChild(h('div.qa-row', input, send));
-      body.appendChild(tip);
-      body.appendChild(chips);
-      body.appendChild(hint);
-      body.appendChild(h('div.qa-foot', last, keep));
+      wrap.appendChild(h('div.qa-row', input, send));
+      wrap.appendChild(tip);
+      wrap.appendChild(chips);
+      wrap.appendChild(hint);
+      wrap.appendChild(h('div.qa-foot', last, keep));
+      body.appendChild(wrap);
     }, onClose: function () {
       draft = !sent && input.value.trim() ? { text: input.value, man: JSON.parse(JSON.stringify(man)), ignore: ignore.slice(), preset: preset, at: Date.now() } : null;
     } });
@@ -7250,7 +7709,7 @@ App.quickadd = (function () {
     function pmTime(p, mn) {
       if (!p || !p.time || !p.ampmGuess || mn.time !== undefined) return null;
       if (mn.repeat !== undefined ? mn.repeat : p.repeat) return null;   /* 반복은 다음 회차가 내일 · 다음 주라 '지난 시각' 걱정이 없음 — 밤에 '매일 7시 기상'이 오후 7시가 되던 것 (새 눈 9호 · nextDay와 같은 규칙) */
-      var day0 = p.date || (mn.date !== undefined ? mn.date : preset.date) || null;   /* 날짜 칩을 금요일로 바꿨으면 금요일 기준 · 껐으면 오늘 기준 */
+      var day0 = p.date || p.due || (mn.date !== undefined ? mn.date : preset.date) || null;   /* '금요일까지 8시'면 금요일 기준(오늘 시계로 짐작하지 않음 · 구역 4) */   /* 날짜 칩을 금요일로 바꿨으면 금요일 기준 · 껐으면 오늘 기준 */
       if (day0 && day0 !== U.today()) return null;
       var n = new Date(U.now()), now = U.hm(n.getHours(), n.getMinutes()), hh = +p.time.slice(0, 2), pm = hh + 12 <= 23 ? U.hm(hh + 12, +p.time.slice(3)) : null;
       return p.time < now && pm && pm >= now ? pm : null;
@@ -7341,9 +7800,11 @@ App.quickadd = (function () {
     }
 
     function draw() {
-      parsed = App.parse.run(input.value, S.data.lists.filter(T.alive), ignore);
+      parsed = App.parse.run(input.value, S.data.lists.filter(T.alive), ignore, S.data.settings);
       send.disabled = !(parsed.title || input.value.trim());
-      tip.hidden = !!input.value.trim();
+      /* 안내 한 줄은 처음 쓰는 동안만 — 글로 날짜 · 시간을 한 번 넣어 봤거나(qaTipDone) 할 일이 열 개를 넘으면 더 안 보임.
+         한 달 쓴 사람이 +를 누를 때마다 같은 설명을 또 읽던 것 (11-14) */
+      tip.hidden = !!input.value.trim() || !!S.data.settings.qaTipDone || S.data.tasks.length >= 10;
 
       var date = val('date'), time = val('time'), rep = val('repeat'), list = val('listId'), prio = val('priority'), due = val('due');
       var alertOn = !!(time && man.alerts && man.alerts.length);
@@ -7362,7 +7823,7 @@ App.quickadd = (function () {
         /* 값이 있어도 반복이면 '반복 · 11월 10일까지'로 — 그날 반복이 끝난다는 게 보이게 (6호 재확인 2차) */
         /* '언제까지'는 값이 있거나 반복일 때만 칩으로 — 빈 칩 다섯 개가 첫인상을 '설정 많음'으로 만들던 것 · 글로 '금요일까지'라고 쓰면 그대로 잡힘 (선택지 점검원 6번) */
         /* 반복일 때만 따로: '반복 끝나는 날'(반복이 아니면 날짜 칩 하나가 기간까지 맡음) */
-        rep && chip('due', 'due', 'target', t('prop.repeatUntil'), due ? t('prop.repeat') + ' · ' + t('due.untilShort', { date: I.relDayIn(due) }) : null, function () { P.date({ title: t('prop.repeatUntil'), value: due, onPick: function (v) { man.due = v; draw(); refocus(); } }); })
+        rep && chip('due', 'due', 'target', t('prop.repeatUntil'), due ? t('rep.until', { date: I.relDayIn(due) }) : null, function () { P.date({ title: t('prop.repeatUntil'), value: due, onPick: function (v) { man.due = v; draw(); refocus(); } }); })
       ];
       flagBtn.classList.toggle('is-on', !!prio); flagBtn.setAttribute('aria-pressed', prio ? 'true' : 'false');
       App.dom.clear(chips);
@@ -7376,6 +7837,7 @@ App.quickadd = (function () {
       } else if (nextDay(parsed, man)) {
         hint.hidden = false; hint.textContent = t('qa.nextDayHint', { date: I.dateShort(U.addDays(U.today(), 1)) });
       } else hint.hidden = true;
+      keepHeight();
     }
 
     /* 위에 다른 창(반복 고르기의 요일 줄처럼 열린 채 값을 넘기는 창)이 떠 있으면 입력 칸으로 가지 않는다 — 키보드가 그 창을 덮지 않게 (7호 1번) */
@@ -7388,12 +7850,15 @@ App.quickadd = (function () {
       if (!title) { refocus(); return; }
       var f = { title: title, date: val('date'), time: val('time'), repeat: val('repeat'), listId: val('listId'), priority: val('priority') || 0, due: val('due'),
         alerts: val('time') && man.alerts ? man.alerts.slice() : [] };
-      var task = S.commit(function (d) { return T.add(d, f); }, { undo: true });   /* 하나 넣기도 되돌리기 가능 — 여러 줄 붙여 넣기와 같게 (점검원 9호 9번) */
+      /* 글에서 날짜 · 시간 · 반복을 알아들어 넣었으면 '같이 적어도 된다'를 익힌 것 — 안내 한 줄을 그만 보임 (11-14) */
+      var learned = !S.data.settings.qaTipDone && parsed.tokens.some(function (tk) { return tk.type === 'date' || tk.type === 'time' || tk.type === 'due' || tk.type === 'repeat'; });
+      var task = S.commit(function (d) { if (learned) d.settings.qaTipDone = true; return T.add(d, f); }, { undo: true });   /* 하나 넣기도 되돌리기 가능 — 여러 줄 붙여 넣기와 같게 (점검원 9호 9번) */
       var off = task.alerts.length && App.ensureNotify({ quiet: true }) === 'denied';
       App.platform.haptic.tap();
       /* 언제가 맨 앞 — 좁은 띠에서 두 줄 말줄임이 잘라 내는 건 긴 제목 끝이지 '내일 오후 3:00'이 아니게 (18호) */
       var bits = [];
-      if (task.date) bits.push(I.relDay(task.date) + (task.time ? ' ' + I.time(task.time) : ''));
+      /* '내일 오후 3:00'은 한 덩어리 — 띠가 두 줄이 될 때 '오후 / 3:00'처럼 시각 가운데서 끊기지 않고 ' · ' 자리에서 끊기게 (11-14) */
+      if (task.date) bits.push((I.relDay(task.date) + (task.time ? ' ' + I.time(task.time) : '')).replace(/ /g, ' '));
       bits.push(task.title);
       var tl = task.listId && task.listId !== preset.listId && T.list(S.data, task.listId);
       if (tl) bits.push(tl.name);   /* 다른 목록에 들어갔으면 어디인지 — 지금 화면에 안 보여도 '잘 들어갔다'를 알게 */
@@ -7427,7 +7892,7 @@ App.quickadd = (function () {
       var base = App.util.now(), dropped = false, moved = false;
       S.commit(function (d) {
         lines.forEach(function (line, i) {
-          var p = App.parse.run(line, lists, []);
+          var p = App.parse.run(line, lists, [], S.data.settings);
           /* 칩으로 고른 목록 · 중요 · 날짜는 줄마다 같이 (한 줄 넣기와 같은 규칙 · 일관성 점검원 · 17호 — 날짜 칩을 금요일로 바꾸거나 끈 뒤 붙여 넣으면 그대로) */
           /* order: 붙여 넣은 차례 그대로 위 → 아래 (큰 값이 위 · 같은 1ms 안이라 값이 같아지지 않게 조금씩 작게) */
           /* 날짜 · 시각은 한 줄 넣기와 같은 규칙(오후 짐작 · 지난 시각이면 내일) — 시각 · 반복은 줄마다 제 것이라 칩 값은 빈 채로 (17호 재확인) */
@@ -7457,6 +7922,104 @@ App.quickadd = (function () {
 
 </script>
 <script>
+/* 복사 (11-16) — 사용자 원문: 여자친구가 학원 레슨생 진도 · 숙제를 할 일로 관리하는데 "매번 같은 숙제를 내주는 게 아니라(했으면 다른 숙제 · 단계 숫자가 바뀜)
+   반복으로 하면 매번 같은 일로 쌓이고, 필요할 때 복사해서 고치는 게 낫다 · 어떤 날 일정을 복사해서 다른 날에 붙여 넣고 싶다".
+   설계(소넷 워커 1명과 합의 · 기획서 0절): 숨은 '복사판'(복사해 두고 다른 날 가서 붙이기) 대신 한 창에서 끝남.
+   ① 다른 날에서 가져오기 = 받을 날(캘린더에서 고른 날)에서 연다 → 가져올 날(기본 1주 전 같은 요일) → 그날 일이 체크 목록(기본 전부) → 'n개 가져오기'.
+      새 주를 짤 때 빈 날 안내 상자 안에 단추가 있어 처음 쓰는 사람도 거기서 찾음 · 일이 있는 날은 그날 목록 맨 아래 조용한 한 줄.
+   ② 할 일 하나 복사 = 자세히 창 아래 '다른 날에 복사' → 날짜 고르기 → 띠 '그날 보기 · 되돌리기'.
+   두 길 모두 같은 규칙 하나(domain/tasks.js copyTo): 새로 적은 일 · 끝낸 기록 없음 · 반복 일은 복사하지 않음. 앱은 이름 속 숫자를 고치거나 짐작하지 않음(고치는 건 사용자) */
+App.copy = (function () {
+  'use strict';
+  var h = App.dom.h, I = App.i18n, t = I.t, U = App.util, T = App.tasks, Q = App.query, S = App.store, ic = App.icons.svg;
+
+  function pullInto(target) {
+    var src = U.addDays(target, -7), off = {};   /* off = 체크를 끈 일 */
+    var chips = h('div.chips.wrap.copy-chips'), listBox = h('div.copy-list'), note = h('p.copy-note'), go = h('button.btn.primary.block', { type: 'button' });
+    var s = App.sheet.open({ title: t('copy.pullTitle'), className: 'copy-sheet', content: function (body) {
+      body.appendChild(h('p.copy-into', t('copy.into', { date: I.dateShort(target) })));
+      body.appendChild(h('div.block-label', t('copy.from')));
+      body.appendChild(chips); body.appendChild(note); body.appendChild(listBox);   /* 안내는 목록 위 — 아래에 두면 일이 많은 날 붙어 있는 '가져오기' 단추 뒤에 가려짐 */
+      body.appendChild(h('div.copy-foot', go));
+      draw();
+    } });
+    function chip(label, day, on, onclick, icon) {
+      return h('button.chip' + (on ? '.is-on' : ''), { type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: onclick },
+        icon ? h('span', { html: ic(icon, 16) }) : null, label, day ? h('span.chip-sub', I.dateShort(day)) : null);
+    }
+    function setSrc(d) { src = d; off = {}; draw(); }
+    function draw() {
+      if (s && s.closed) return;   /* 첫 그리기는 창을 여는 중(s가 아직 없음) */
+      var weekAgo = U.addDays(target, -7), dayAgo = U.addDays(target, -1);
+      App.dom.clear(chips);
+      chips.appendChild(chip(t('copy.weekAgo'), weekAgo, src === weekAgo, function () { setSrc(weekAgo); }));
+      chips.appendChild(chip(t('copy.dayAgo'), dayAgo, src === dayAgo, function () { setSrc(dayAgo); }));
+      var isCustom = src !== weekAgo && src !== dayAgo;
+      /* 직접 고른 날은 그 날짜가 칩 이름 · 다시 누르면 다른 날 */
+      chips.appendChild(chip(isCustom ? I.dateShort(src) : t('menu.pickShort'), null, isCustom, function () {
+        App.pickers.date({ title: t('copy.from'), value: isCustom ? src : null, allowNone: false, disabled: function (x) { return x === target; },
+          onPick: function (v) { if (v && v !== target) setSrc(v); } });
+      }, 'calendar'));
+
+      var cs = Q.copySource(S.data, src), items = cs.items;
+      /* 받을 날에 이미 같은 일이 있으면 그 줄은 처음엔 끈 채로 — 같은 날에 두 번 가져와 조용히 두 줄이 쌓이지 않게(새 눈 검토 11-16 · 같은 수업 학생이 둘이면 켜서 가져옴) */
+      items.forEach(function (it) { if (!(it.task.id in off) && Q.sameOn(S.data, target, it.task)) off[it.task.id] = true; });
+      App.dom.clear(listBox);
+      if (!items.length) listBox.appendChild(h('p.day-empty', t('copy.empty')));
+      else listBox.appendChild(h('div.card', items.map(function (it) {
+        var tk = it.task, on = !off[tk.id], l = tk.listId && T.list(S.data, tk.listId);
+        var meta = [tk.time ? I.time(tk.time) : null, l ? l.name : null].filter(Boolean).join(' · ');
+        var same = Q.sameOn(S.data, target, tk);
+        var box = h('span.check.sm' + (on ? '.is-on' : ''), { 'aria-hidden': 'true', html: App.icons.CHECK });
+        var row = h('button.copy-row', { type: 'button', role: 'checkbox', 'aria-checked': on ? 'true' : 'false', onclick: function () {
+            off[tk.id] = !off[tk.id]; App.platform.haptic.tap();
+            var now = !off[tk.id]; row.setAttribute('aria-checked', now ? 'true' : 'false'); box.classList.toggle('is-on', now); paintGo(items);   /* 그 줄만 바꿈(다시 그리지 않아 체크가 제자리에서 차오름) */
+          } },
+          h('span.prop-icon', box),
+          h('span.copy-text', h('span.copy-title', tk.title || t('row.untitled')),
+            meta || same ? h('span.copy-meta', meta, same ? h('span.copy-same', t('copy.same')) : null) : null));
+        return row;
+      })));
+      var lines = [];
+      if (items.length) lines.push(t('copy.asNew'));
+      if (cs.repeats) lines.push(t('copy.repeatNote', { n: cs.repeats }));
+      note.textContent = lines.join(' ');
+      note.hidden = !lines.length;
+      paintGo(items);
+    }
+    function picked(items) { return items.filter(function (it) { return !off[it.task.id]; }).map(function (it) { return it.task.id; }); }
+    function paintGo(items) {
+      var ids = picked(items);
+      go.disabled = !ids.length;
+      go.textContent = ids.length ? t('copy.pullN', { n: ids.length }) : t('copy.pullNone');
+      go.onclick = function () {
+        var made = S.commit(function (d) { return T.copyMany(d, ids, target); }, { undo: true }) || [];
+        s.close(true);
+        if (!made.length) return;
+        App.row.flash(made.map(function (x) { return x.id; }));
+        App.toast.show(t('copy.pulled', { n: made.length }), { action: t('common.undo'), onAction: S.undo });
+      };
+    }
+  }
+
+  /* 할 일 하나 → 고른 날로 복사. 반복 일은 부르지 않음(자세히 창이 단추를 숨김) */
+  function taskTo(id) {
+    var tk = T.find(S.data, id); if (!tk || tk.repeat) return;
+    App.pickers.date({ title: t('copy.oneTitle'), value: null, allowNone: false, note: t('copy.asNew'), onPick: function (v) {
+      if (!v) return;
+      var made = S.commit(function (d) { return T.copyTo(d, id, v, U.now()); }, { undo: true });
+      if (!made) return;
+      App.toast.show(t('copy.oneDone', { date: I.relDayIn(v) }), {
+        action: t('copy.see'), onAction: function () { App.sheet.closeAll(); App.screens.calendar.show(v); App.row.flash(made.id); },
+        action2: t('common.undo'), onAction2: S.undo });
+    } });
+  }
+
+  return { pullInto: pullInto, taskTo: taskTo };
+})();
+
+</script>
+<script>
 /* 설정 — 끝낸 일 보이기 · 테마 · 한 주 시작 · 진동 · 알림 상태 · 옮기기(백업) · 정보. 처음엔 열 필요가 없게 기본값을 잡아 둔다. */
 App.screens.settings = (function () {
   'use strict';
@@ -7470,7 +8033,7 @@ App.screens.settings = (function () {
   function setting(k, v) { S.commit(function (d) { d.settings[k] = v; }); }
 
   function block(label, body, note, plain) {
-    return h('section.section', h('div.section-head', h('span.section-label', label)), plain ? h('div.seg-wrap', body) : h('div.card.set-card', body), note ? h('p.prop-note', { text: note }) : null);
+    return h('section.section', label ? h('div.section-head', h('span.section-label', label)) : null, plain ? h('div.seg-wrap', body) : h('div.card.set-card', body), note ? h('p.prop-note', { text: note }) : null);
   }
   /* 고르기 줄(세그먼트)은 카드로 한 번 더 감싸지 않는다 — 테두리 두 겹 방지 (오푸스 조수 1차) */
   function choice(label, body, note) { return block(label, body, note, true); }
@@ -7490,12 +8053,12 @@ App.screens.settings = (function () {
     if (App.platform.name === 'android') {
       rows.push(h('button.prop', { type: 'button', onclick: function () { N.openBattery(); } }, h('span.prop-icon', { html: ic('clock', 20) }), h('span.prop-label', t('notify.battery')), h('span.prop-chev', { html: ic('chevR', 18) })));
     }
-    return block(t('set.notify'), rows, N.kind === 'foreground' ? t('notify.foregroundNote') : null);
+    return block(null, rows, N.kind === 'foreground' ? t('notify.foregroundNote') : null);   /* 화면 제목이 이미 '알림' — 묶음 이름을 또 쓰지 않음(시험판 화면과 같게 · 구역 5) */
   }
 
   function backupBlock() {
     var F = App.platform.files;
-    return block(t('set.backup'), [
+    return block(null, [   /* 화면 제목(기록 지키기)이 이미 말함 — 같은 뜻 묶음 이름을 또 쓰지 않음 (구역 5) */
       h('button.prop', { type: 'button', onclick: function () {
         var name = 'todo-backup-' + App.util.today() + '.json';
         Promise.resolve(F.exportFile(name, S.exportText())).then(function (ok) {
@@ -7533,42 +8096,13 @@ App.screens.settings = (function () {
     ], App.platform.info.isIOS && !App.platform.info.standalone ? t('backup.note') + ' ' + t('backup.safari') : App.platform.info.macSafari ? t('backup.note') + ' ' + t('backup.safariMac') : t('backup.note'));
   }
 
-  function trash() {
-    var s = App.sheet.open({ title: t('trash.row'), content: function (body) {
-      function draw() {
-        App.dom.clear(body);
-        var gone = S.data.tasks.filter(function (x) { return x.deletedAt; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
-        /* 지운 목록도 30일 동안 — 되살리면 안에 있던 할 일이 다시 그 목록으로 (6호 6번) */
-        var goneLists = S.data.lists.filter(function (l) { return l.deletedAt; });
-        if (!gone.length && !goneLists.length) { body.appendChild(h('p.day-empty', t('trash.empty'))); return; }
-        body.appendChild(h('div.card', goneLists.map(function (l) {
-          var days = Math.max(0, 30 - Math.floor((App.util.now() - l.deletedAt) / 86400000));
-          return h('div.set-row',
-            h('span.prop-label', t('trash.listRow', { name: l.name }), h('span.prop-sub', (days > 0 ? t('trash.left', { n: days }) : t('trash.leftToday')))),
-            h('button.text-btn', { type: 'button', onclick: function () {
-              S.commit(function (d) { App.tasks.restoreList(d, l.id); });
-              App.toast.show(t('trash.restored')); draw();
-            } }, t('trash.restore')));
-        }).concat(gone.map(function (x) {
-          var days = Math.max(0, 30 - Math.floor((App.util.now() - x.deletedAt) / 86400000));
-          return h('div.set-row',
-            h('span.prop-label', x.title || t('row.untitled'), h('span.prop-sub', (days > 0 ? t('trash.left', { n: days }) : t('trash.leftToday')))),
-            h('button.text-btn', { type: 'button', onclick: function () {
-              S.commit(function (d) { App.tasks.restore(d, x.id); });
-              App.toast.show(t('trash.restored')); draw();
-            } }, t('trash.restore')));
-        }))));
-      }
-      draw();
-    } });
-    return s;
-  }
+  /* '최근 지운 항목'은 목록 화면 맨 아래로 옮김(lists.js trash) — 설정에는 설정만 (11-14) */
 
   /* 설정은 두 층: 첫 화면 = 묶음 줄(지금 값 요약 · ›) → 눌러 들어가서 바꾼다 (사용자 10-31 '죄다 펼쳐져 있는 느낌 · 헤더가 상위 개념이 되게').
-     묶음 = 보기(글자 · 화면 색 · 채우는 색 · 끝낸 일 · 한 주 시작 · 진동) / 알림 / 기록 지키기(백업 · 옮기기) + 최근 지운 할 일 · 시험판.
-     '끝낸 일'은 고를 줄이 하나뿐이라 따로 한 장을 쓰면 한 번 더 들어가야 해서 '보기'로 합침 (일관성 점검원 10-31).
-     묶음 이름은 '화면과 쓰는 방식' — '화면'만이면 끝낸 일 · 언어 · 한 주 시작 · 진동이 거기 있을 거라 짐작하기 어려웠음 (18호) */
-  var GROUPS = ['look', 'notify', 'records', 'trial'];
+     묶음 = 화면(글자 · 화면 색 · 주 색 · 중요 표시) / 일반(끝낸 일 · 한 주 시작 · 진동 · 언어) / 알림 / 백업 + 시험판.
+     11-14: 옛 '화면과 쓰는 방식' 한 장을 둘로 — 보이는 것과 쓰는 규칙이 한 화면에 섞여 이름부터 어색했음(18호가 이름을 길게 늘여 푼 것을 화면을 나눠서 풂 · 화면 하나에 맡은 일 하나).
+     '끝낸 일'은 고를 줄이 하나뿐이라 따로 한 장을 쓰지 않고 '일반'에 (일관성 점검원 10-31) */
+  var GROUPS = ['look', 'general', 'notify', 'records', 'trial'];
 
   function groupRow(key, icon, label, sum) {
     return h('button.prop.set-group', { type: 'button', onclick: function () { App.go('set', key); } },
@@ -7582,11 +8116,16 @@ App.screens.settings = (function () {
       seg(['light', 'graphite', 'dark'].map(function (k) { return [k, [h('span.seg-dot.is-' + k, { 'aria-hidden': 'true' }), t('set.theme.' + k)]]; }), st.theme,   /* 첫 실행과 같은 차례 (7호 참고) */ function (v) { setting('theme', v); }, t('set.theme'))));
     screen.appendChild(accentBlock(st));
     screen.appendChild(markBlock(st));
+  }
+
+  function generalPage(screen, st) {
     donePage(screen, st);
     screen.appendChild(choice(t('set.week'),
       seg([[0, I.weekdayLong(0)], [1, I.weekdayLong(1)]], st.weekStart, function (v) { setting('weekStart', v); }, t('set.week'))));
     /* 진동을 낼 수 없는 기기(아이폰 사파리 · 웹앱 = navigator.vibrate 없음)에서는 이 줄을 보이지 않는다 — 켜도 아무 일 없는 설정 (3호 8번) */
-    if (App.platform.name !== 'web' || navigator.vibrate) screen.appendChild(choice(t('set.haptic'),
+    /* PC 크롬 · 엣지는 navigator.vibrate가 있어도 몸체가 없어 떨리지 않음 — 손가락 화면(pointer: coarse)일 때만 (구역 5) */
+    var canBuzz = App.platform.name !== 'web' || (navigator.vibrate && window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    if (canBuzz) screen.appendChild(choice(t('set.haptic'),
       seg([[true, t('common.on')], [false, t('common.off')]], st.haptic, function (v) { setting('haptic', v); }, t('set.haptic'))));
     /* 언어 — 기본은 기기 따라, 한국어 · English로 고정할 수 있음 (사용자 11-01). 이름은 그 언어 그대로(어느 언어로 보고 있어도 자기 말을 찾게) */
     screen.appendChild(choice(t('set.lang'),
@@ -7763,31 +8302,23 @@ App.screens.settings = (function () {
     return t('notify.short.' + s);
   }
 
-  function gone() { return S.data.tasks.filter(function (x) { return x.deletedAt; }).concat(S.data.lists.filter(function (l) { return l.deletedAt; })); }
-  function trashRow() {
-    var n = gone().length;
-    /* 최근 지운 할 일 — 지운 뒤 30일 동안 되살릴 수 있음 (점검원 1호 6번) */
-    return h('button.prop', { type: 'button', onclick: trash }, h('span.prop-icon', { html: ic('trash', 20) }),
-      h('span.prop-label', t('trash.row'), h('span.prop-sub', t('trash.sub'))),
-      h('span.prop-value.num', n ? t('trash.count', { n: n }) : ''), h('span.prop-chev', { html: ic('chevR', 18) }));
-  }
-
   /* 묶음 안 화면 — 위에 '‹ 설정' (목록 하나 보기 화면과 같은 모양) */
   function page(main, key) {
     var st = S.data.settings, screen = h('div.screen.screen-settings');
-    var title = { look: t('set.look'), notify: t('set.notify'), records: t('set.records'), trial: t('set.trial') }[key];
+    var title = { look: t('set.look'), general: t('set.general'), notify: t('set.notify'), records: t('set.records'), trial: t('set.trial') }[key];
     screen.appendChild(h('header.page-head', h('div',
       h('button.back-btn', { type: 'button', onclick: function () { App.back(); } }, h('span', { html: ic('chevL', 18) }), t('nav.settings')),
       h('h1.title', title))));
     if (key === 'look') lookPage(screen, st);
+    else if (key === 'general') generalPage(screen, st);
     else if (key === 'notify') screen.appendChild(notifyBlock());
     else if (key === 'trial') screen.appendChild(trialBlock());
-    else screen.appendChild(backupBlock());   /* 최근 지운 할 일은 설정 첫 화면에 한 번만 (7호 참고 — 두 곳에 있던 것) */
+    else screen.appendChild(backupBlock());
     main.appendChild(screen);
   }
 
   function render(main, key) {
-    if (key === 'done') key = 'look';   /* 옛 주소(끝낸 일 묶음)는 보기로 */
+    if (key === 'done') key = 'general';   /* 옛 주소(끝낸 일 묶음)는 일반으로 */
     if (key && GROUPS.indexOf(key) >= 0) { page(main, key); return; }
     var st = S.data.settings, M = App.model;
     var screen = h('div.screen.screen-settings');
@@ -7796,12 +8327,12 @@ App.screens.settings = (function () {
     screen.appendChild(h('div.card.set-groups',
       /* 요약 = 화면 색 · 주 색(글자 크기는 기본 100%가 아닐 때만 앞에) — 390px에서도 '…'로 잘리던 것 (새 눈 점검원 2호 14번) */
       groupRow('look', 'sun', t('set.look'), (Math.round(M.scale(st.textSize) * 100) !== 100 ? Math.round(M.scale(st.textSize) * 100) + '% · ' : '') + t('set.theme.' + st.theme) + ' · ' + t('accent.' + (M.ACCENTS.indexOf(st.accent) >= 0 ? st.accent : 'tangerine'))),
+      groupRow('general', 'sliders', t('set.general'), ''),
       groupRow('notify', 'bell', t('set.notify'), notifyShort()),
       groupRow('records', 'share', t('set.records'), st.lastExport ? t('backup.lastShort', { date: I.dateNoWeek(st.lastExport) }) : '')));
-    screen.appendChild(h('div.card.set-groups.mt-l', trashRow()));
     /* 시험판 묶음은 한 줄로 접어 안쪽 화면에 — 매일 쓰는 사람이 설정을 열 때마다 '처음 상태로 되돌리기'가 눈앞에 있던 것 (새 눈 점검원 1호 8번 · 무서움 없게).
        예시를 보는 중이면 그 줄에 '예시 보는 중'이 보여 돌아갈 길을 잃지 않음 */
-    screen.appendChild(h('div.card.set-groups.mt-l', groupRow('trial', 'sparkle', t('set.trial'), S.data.meta && S.data.meta.trial ? t('set.trialOn') : '')));
+    screen.appendChild(h('div.card.set-groups.mt-l', groupRow('trial', 'sparkle', t('set.trial'), S.data.meta && S.data.meta.trial && S.data.meta.trial !== 'fresh' ? t('set.trialOn') : '')));
     screen.appendChild(h('p.app-info', t('set.version', { v: window.APP_VERSION || 'dev' })));
     main.appendChild(screen);
   }
@@ -7948,6 +8479,7 @@ App.onboarding = (function () {
     if (useHistory) try { history.pushState(route, '', hashOf(route)); } catch (e) {}
     App.render(true);
   };
+  App.routeIs = function (name, arg) { return route.name === name && (arg === undefined || route.arg === arg); };   /* 지금 보는 화면인가 (목록 지울 때 — 35호) */
   var navDir = 0, restoreY = 0;   /* 뒤로 왔을 때 돌려놓을 스크롤 — 목록 · 설정 묶음에서 나오면 맨 위로 튀던 것 */
   /* 뒤로: 창이 열려 있으면 창부터 → 온 길을 거슬러 → 없으면 오늘로 → 오늘이면 앱 밖으로(안드로이드) */
   App.back = function () {
@@ -8066,7 +8598,7 @@ App.onboarding = (function () {
   function navOn(cls, name, arg) { return route.name === name && (arg === undefined || route.arg === arg) || (name === 'lists' && route.name === 'list' && cls === 'tab') || (name === 'settings' && route.name === 'set'); }
   function navItem(cls, name, icon, label, count, arg) {
     return h('button.' + cls, { type: 'button', 'data-nav': name, 'aria-current': navOn(cls, name, arg) ? 'page' : null, onclick: function () { App.go(name, arg); } },
-      h('span', { html: ic(icon, cls === 'tab' ? 24 : 20) }), h('span.nav-label', label), count ? h('span.nav-count.num', String(count)) : null);
+      h('span.nav-ico', { html: ic(icon, cls === 'tab' ? 24 : 20) }), h('span.nav-label', label),   /* nav-ico = 옆 메뉴 줄 앞 표시 칸(목록 색 점과 같은 세로줄 · 11-16) */ count ? h('span.nav-count.num', String(count)) : null);
   }
   /* 아래 탭 줄은 한 번 만들고(언어가 바뀔 때만 다시), 그릴 때는 '지금 탭' 표시만 바꾼다 —
      그릴 때마다 단추를 새로 만들면, 그 순간 누르던 단추가 사라져 누름이 헛돈다(창을 닫으며 키보드가 내려가는 동안 다시 그려져 +를 두 번 눌러야 열리던 것 · 사용자 11-01) */
@@ -8098,14 +8630,14 @@ App.onboarding = (function () {
     sidebar.appendChild(navItem('side-item', 'calendar', 'calendar', t('nav.calendar')));
     sidebar.appendChild(navItem('side-item', 'lists', 'lists', t('nav.lists')));
     sidebar.appendChild(h('button.side-item', { type: 'button', onclick: App.screens.lists.search },   /* 넓은 화면 찾기 + 단축키 / (2호 10번) */
-      h('span', { html: ic('search', 20) }), h('span.nav-label', t('search.title')), h('kbd.side-kbd', '/')));
+      h('span.nav-ico', { html: ic('search', 20) }), h('span.nav-label', t('search.title')), h('kbd.side-kbd', '/')));
     var lists = d.lists.filter(T.alive).sort(function (a, b) { return a.order - b.order; });   /* 목록 탭에서 끌어 바꾼 순서 그대로 (새 눈 6호 4번) */
     if (lists.length) {
       sidebar.appendChild(h('div.side-label', t('nav.myLists')));
       lists.forEach(function (l) {
         var on = route.name === 'list' && route.arg === l.id;
         var it = h('button.side-item.side-list', { type: 'button', 'aria-current': on ? 'page' : null, onclick: function () { if (Date.now() < it._held) return; App.go('list', l.id); } },
-          App.listMark(l), h('span.nav-label', l.name), h('span.nav-count.num', String(Q.remaining(d, l.id) || '')));
+          h('span.nav-ico', App.listMark(l)), h('span.nav-label', l.name), h('span.nav-count.num', String(Q.remaining(d, l.id) || '')));
         App.row.longPress(it, function () { it._held = Date.now() + 700; App.screens.lists.more(l); });   /* 오른쪽 클릭 · 꾹 = 목록 '…' 창 (목록 첫 화면과 같은 손짓) */
         sidebar.appendChild(it);
       });
@@ -8230,7 +8762,7 @@ App.onboarding = (function () {
   /* ── 업데이트 뒤 처음 열 때 한 번만 '새 판' 안내 (재료 '첫 실행 · 시작 화면' 1절) ──
      바뀐 것 3~4줄 + 마지막 줄 '할 일 기록은 그대로예요', [확인] 한 번. 처음 깐 사람에게는 띄우지 않는다(이번 판을 이미 본 것으로).
      새 판을 낼 때: NEWS_ID를 올리고 lang의 news.lines를 그 판의 말로 바꾼다 */
-  var NEWS_ID = '2026-11-03';   /* 11-01 새벽 판: 기간 · 알림 · 세 단 캘린더 · 적던 글 남김 */
+  var NEWS_ID = '2026-11-16';   /* 11-16 판: 다른 날에서 가져오기 · 할 일 하나 복사(여자친구 요청)를 맨 앞에 — v0.1.112 · 113을 이미 깔아 11-15 안내를 본 사람에게도 다시 보이게 번호를 올림. 옛 11-15 판: 한 일 넘겨 보기 · 설정 나눔(화면 · 일반) · 지운 항목 자리 · 새 아이콘 (옛 '2026-11-03' = 기간 · 알림 · 세 단 캘린더 · 적던 글 남김) */
   function whatsNew() {
     var st = S.data.settings;
     if (!st.onboarded) { if (st.seenNews !== NEWS_ID) S.commit(function (d) { d.settings.seenNews = NEWS_ID; }, { keepUndo: true, carry: true }); return; }
@@ -8303,6 +8835,8 @@ App.onboarding = (function () {
     App.render(true);
     if (S.afterStart()) App.render.now();   /* 알림의 '끝냄' 쪽지는 시작이 무사히 끝난 뒤에 반영(비상 화면이면 쪽지를 남겨 둠 · 새 눈 8호 6번) · 반영했으면 첫 화면도 바로 '끝냄'으로 */
     whatsNew();
+    /* 닫힌 앱을 웹 알림으로 열면 sw가 주소에 '?task=…&key=…'를 붙여 옴 — 안드로이드(__openTask)와 같게 그 할 일을 엶 · 주소에서는 지움 (구역 6) */
+    if (!window.__openTask) try { var q = new URLSearchParams(location.search); if (q.get('task')) { window.__openTask = { id: q.get('task'), key: q.get('key') || 'once' }; history.replaceState(history.state, '', location.pathname + location.hash); } } catch (e) {}
     if (window.__openTask) { App.openTask(window.__openTask.id, window.__openTask.key); window.__openTask = null; }
   } catch (err) {
     /* 시작 그리기가 터지면 빈 화면 대신 '할 일은 그대로 · 파일로 내보내기' 한 장 — 저장된 글을 그대로 내보냄(고치지 않음) (새 눈 5호 재확인) */
@@ -8325,7 +8859,11 @@ App.onboarding = (function () {
     /* 화면 색 · 주 색이 바뀌면: 옛 화면 한 장 → 새 색 · 새 내용(고른 표시)을 한꺼번에 그린 화면으로 겹쳐 바꿈 (switchLook) */
     if (themeNow && themeNow !== lookKey() && !(o && o.reset)) switchLook(function () { applyTheme(); App.render.now(); });
     else { applyTheme(); App.render(); }
-    if (o && o.reset) { route = { name: 'today', arg: null }; stack = []; App.sheet.closeAll(); App.onboarding.open(); }
+    if (o && o.reset) {
+      route = { name: 'today', arg: null }; stack = []; App.sheet.closeAll(); App.onboarding.open();
+      if (useHistory) try { history.replaceState(route, '', hashOf(route)); } catch (e) {}   /* 주소도 오늘로 — '#/set/trial'이 남아 새로고침 · 뒤로가 엉뚱한 화면으로 가던 것 (구역 5) */
+      setTimeout(whatsNew, 0);   /* 새로 깐 것처럼 — 켤 때와 같은 규칙으로 '새 버전' 소식은 본 것으로(다음에 켜면 소식 창이 뜨던 것 · 구역 5). 지금 바꾸기가 끝난 뒤에 */
+    }
     else if (App.onboarding.isOpen && S.data.settings.onboarded) App.onboarding.close();  /* 초기화를 되돌렸을 때 */
   });
   /* 앱을 보는 중에 온 알림(아이폰 웹앱) — '열기'로 바로 그 할 일로, 10초 (4호 8번) */

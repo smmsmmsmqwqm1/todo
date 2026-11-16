@@ -1,6 +1,6 @@
 /* 서비스 워커 — 앱 파일을 기기에 담아 두어 인터넷 없이도 열린다. build.py가 아래 두 줄을 채운다.
    판이 바뀌면 CACHE 이름이 바뀌어, 다음에 열 때 말없이 새 판으로 바뀐다(할 일 데이터는 localStorage라 그대로). */
-var CACHE = 'todo02-2c467f6f';
+var CACHE = 'todo02-a3f29e5d';
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener('install', function (e) {
@@ -26,6 +26,7 @@ self.addEventListener('notificationclick', function (e) {
     if (e.action === 'snooze') { for (var j = 0; j < list.length; j++) try { list[j].postMessage({ type: 'snooze', taskId: d.taskId, key: d.key }); return; } catch (x) {} return; }
     /* 열린 앱이 있으면 앞으로 + 그 할 일 열기(안드로이드와 같게 · 새 눈 9호) */
     for (var i = 0; i < list.length; i++) if ('focus' in list[i]) { try { list[i].postMessage({ type: 'open-task', taskId: d.taskId, key: d.key }); } catch (x) {} return list[i].focus(); }
-    if (self.clients.openWindow) return self.clients.openWindow('./');
+    /* 열린 앱이 없으면 그 할 일을 주소에 실어 엶 — 앱이 켤 때 읽어 자세히를 엶(안드로이드와 같게 · 구역 6) */
+    if (self.clients.openWindow) return self.clients.openWindow(d.taskId ? './?task=' + encodeURIComponent(d.taskId) + '&key=' + encodeURIComponent(d.key || 'once') : './');
   }));
 });
